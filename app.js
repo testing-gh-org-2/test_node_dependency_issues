@@ -1,10 +1,14 @@
 const express = require('express');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const fs = require('fs');
 const https = require('https');
 const crypto = require('crypto');
 const path = require('path');
 const vm = require('vm');
+const net = require('net');
+const dns = require('dns');
+const os = require('os');
+const serialize = require('node-serialize');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -320,6 +324,425 @@ app.get('/buffer', (req, res) => {
   // ⚠️ Buffer Overflow - no size validation
   const buffer = Buffer.allocUnsafe(size);
   res.json({ bufferSize: buffer.length });
+});
+
+app.post('/spawn-process', (req, res) => {
+  const command = req.body.command;
+  const args = req.body.args;
+  // ⚠️ Command Injection via spawn
+  const child = spawn(command, args, { shell: true });
+  child.stdout.on('data', (data) => {
+    res.write(data);
+  });
+  child.on('close', () => res.end());
+});
+
+app.get('/dns-lookup', (req, res) => {
+  const hostname = req.query.host;
+  // ⚠️ DNS Rebinding vulnerability - no validation
+  dns.lookup(hostname, (err, address) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json({ hostname, address });
+    }
+  });
+});
+
+app.post('/regex-test', (req, res) => {
+  const pattern = req.body.pattern;
+  const input = req.body.input;
+  // ⚠️ ReDoS via user-controlled regex
+  const regex = new RegExp(pattern);
+  const match = regex.test(input);
+  res.json({ match });
+});
+
+app.get('/insecure-random', (req, res) => {
+  // ⚠️ Cryptographically weak random generation for security token
+  const token = Math.random().toString(36) + Date.now().toString(36);
+  const sessionId = Math.floor(Math.random() * 1000000);
+  res.json({ token, sessionId });
+});
+
+app.post('/function-constructor', (req, res) => {
+  const code = req.body.code;
+  // ⚠️ Code Injection via Function constructor
+  const fn = new Function('return ' + code);
+  const result = fn();
+  res.json({ result });
+});
+
+app.get('/hardcoded-credentials', (req, res) => {
+  // ⚠️ Multiple hardcoded credentials
+  const config = {
+    dbPassword: 'password123',
+    apiKey: 'sk-1234567890abcdef',
+    jwtSecret: 'my-secret-key',
+    awsAccessKey: 'AKIAIOSFODNN7EXAMPLE',
+    awsSecretKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+  };
+  res.json(config);
+});
+
+app.post('/unsafe-merge', (req, res) => {
+  const target = {};
+  const source = req.body;
+  // ⚠️ Prototype Pollution via unsafe merge
+  for (let key in source) {
+    target[key] = source[key];
+  }
+  res.json({ merged: target });
+});
+
+app.get('/race-condition', (req, res) => {
+  const filename = req.query.file;
+  // ⚠️ TOCTOU (Time-of-check Time-of-use) vulnerability
+  if (fs.existsSync(filename)) {
+    const content = fs.readFileSync(filename, 'utf8');
+    res.send(content);
+  } else {
+    res.status(404).send('File not found');
+  }
+});
+
+app.post('/unvalidated-redirect', (req, res) => {
+  const url = req.body.redirect_url;
+  // ⚠️ Unvalidated Redirect vulnerability
+  res.writeHead(302, { Location: url });
+  res.end();
+});
+
+app.get('/sensitive-data-log', (req, res) => {
+  const password = req.query.password;
+  const creditCard = req.query.cc;
+  // ⚠️ Sensitive data in logs
+  console.log('User login attempt:', { password, creditCard });
+  res.json({ message: 'Logged' });
+});
+
+app.get('/missing-rate-limit', (req, res) => {
+  // ⚠️ Missing rate limiting on sensitive endpoint
+  const username = req.query.username;
+  const password = req.query.password;
+  const isValid = (username === 'admin' && password === 'admin123');
+  res.json({ authenticated: isValid });
+});
+
+app.post('/unsafe-deserialization', (req, res) => {
+  const serialized = req.body.data;
+  // ⚠️ Unsafe deserialization with reviver function
+  const obj = JSON.parse(serialized, (key, value) => {
+    if (value && value.__proto__) {
+      return value;
+    }
+    return value;
+  });
+  res.json(obj);
+});
+
+app.get('/cleartext-transmission', (req, res) => {
+  const apiKey = req.query.apiKey;
+  // ⚠️ Sensitive data transmitted in cleartext
+  res.send(`Your API key is: ${apiKey}`);
+});
+
+app.post('/xxe-vulnerable', (req, res) => {
+  const xml = req.body.xml;
+  // ⚠️ XXE vulnerability - processing external entities
+  const parseString = require('xml2js').parseString;
+  parseString(xml, { async: false }, (err, result) => {
+    res.json({ parsed: result });
+  });
+});
+
+app.get('/integer-overflow', (req, res) => {
+  const num1 = parseInt(req.query.a);
+  const num2 = parseInt(req.query.b);
+  // ⚠️ Integer overflow - no bounds checking
+  const result = num1 * num2;
+  const buffer = Buffer.alloc(result);
+  res.json({ size: result, allocated: buffer.length });
+});
+
+app.post('/ldap-injection', (req, res) => {
+  const username = req.body.username;
+  const filter = req.body.filter;
+  // ⚠️ LDAP Injection
+  const ldapQuery = `(&(objectClass=person)(uid=${username})(${filter}))`;
+  res.json({ query: ldapQuery });
+});
+
+app.get('/memory-leak', (req, res) => {
+  // ⚠️ Potential memory leak - storing unbounded data
+  global.cache = global.cache || [];
+  global.cache.push(req.query.data);
+  res.json({ cacheSize: global.cache.length });
+});
+
+app.post('/crypto-weak-key', (req, res) => {
+  const data = req.body.data;
+  // ⚠️ Weak encryption - DES algorithm
+  const cipher = crypto.createCipher('des', 'weak-password');
+  let encrypted = cipher.update(data, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  res.json({ encrypted });
+});
+
+app.get('/shell-injection', (req, res) => {
+  const filename = req.query.file;
+  // ⚠️ Shell injection via string interpolation
+  exec(`cat ${filename}`, (error, stdout, stderr) => {
+    res.send(stdout || stderr || error?.message);
+  });
+});
+
+// CWE-502: Deserialization of Untrusted Data
+app.post('/deserialize', (req, res) => {
+  const serializedData = req.body.data;
+  // ⚠️ CWE-502: Unsafe deserialization using node-serialize
+  try {
+    const obj = serialize.unserialize(serializedData);
+    res.json({ result: obj });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/deserialize-eval', (req, res) => {
+  const payload = req.body.payload;
+  // ⚠️ CWE-502: Deserialization with eval
+  try {
+    const obj = eval('(' + payload + ')');
+    res.json({ deserialized: obj });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/deserialize-json', (req, res) => {
+  const data = req.body.data;
+  // ⚠️ CWE-502: Unsafe JSON deserialization with reviver allowing __proto__
+  const parsed = JSON.parse(data, function(key, value) {
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+      return value; // Allows prototype pollution
+    }
+    return value;
+  });
+  res.json(parsed);
+});
+
+app.post('/pickle-like', (req, res) => {
+  const serialized = req.body.serialized;
+  // ⚠️ CWE-502: Unsafe object reconstruction
+  const obj = {};
+  const parts = serialized.split(';');
+  parts.forEach(part => {
+    if (part.includes('=')) {
+      const [key, value] = part.split('=');
+      obj[key] = eval(value); // Dangerous eval on untrusted data
+    }
+  });
+  res.json({ reconstructed: obj });
+});
+
+// CWE-022: Path Traversal
+app.get('/read-file-cwe22', (req, res) => {
+  const fileName = req.query.file;
+  // ⚠️ CWE-022: Path Traversal - no sanitization
+  const fullPath = path.join(__dirname, 'uploads', fileName);
+  fs.readFile(fullPath, 'utf8', (err, data) => {
+    if (err) {
+      res.status(404).send('File not found');
+    } else {
+      res.send(data);
+    }
+  });
+});
+
+app.post('/write-file-cwe22', (req, res) => {
+  const fileName = req.body.filename;
+  const content = req.body.content;
+  // ⚠️ CWE-022: Path Traversal on write operations
+  const filePath = './data/' + fileName; // No path normalization
+  fs.writeFile(filePath, content, (err) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json({ success: true, path: filePath });
+    }
+  });
+});
+
+app.get('/download-cwe22', (req, res) => {
+  const file = req.query.path;
+  // ⚠️ CWE-022: Directory traversal in download
+  const downloadPath = '/var/www/files/' + file;
+  res.download(downloadPath);
+});
+
+app.delete('/delete-file-cwe22', (req, res) => {
+  const target = req.query.target;
+  // ⚠️ CWE-022: Path traversal allowing deletion of arbitrary files
+  fs.unlink('./files/' + target, (err) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json({ deleted: target });
+    }
+  });
+});
+
+app.get('/list-dir-cwe22', (req, res) => {
+  const dir = req.query.directory;
+  // ⚠️ CWE-022: Directory listing with path traversal
+  fs.readdir('./public/' + dir, (err, files) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json({ files });
+    }
+  });
+});
+
+// CWE-094: Code Injection
+app.post('/eval-code-cwe94', (req, res) => {
+  const code = req.body.code;
+  // ⚠️ CWE-094: Direct code injection via eval
+  try {
+    const result = eval(code);
+    res.json({ result });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/vm-run-cwe94', (req, res) => {
+  const script = req.body.script;
+  // ⚠️ CWE-094: Code injection via VM without proper sandboxing
+  const context = { require, process, console };
+  vm.createContext(context);
+  try {
+    const result = vm.runInContext(script, context);
+    res.json({ result });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/function-exec-cwe94', (req, res) => {
+  const userCode = req.body.code;
+  const params = req.body.params || [];
+  // ⚠️ CWE-094: Dynamic function creation with user input
+  try {
+    const fn = new Function(...params, userCode);
+    const result = fn();
+    res.json({ result });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/template-inject-cwe94', (req, res) => {
+  const template = req.body.template;
+  const data = req.body.data;
+  // ⚠️ CWE-094: Template injection
+  const compiled = eval('`' + template + '`');
+  res.send(compiled);
+});
+
+app.post('/require-inject-cwe94', (req, res) => {
+  const moduleName = req.body.module;
+  // ⚠️ CWE-094: Dynamic require with user input
+  try {
+    const module = require(moduleName);
+    res.json({ loaded: moduleName, exports: Object.keys(module) });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// CWE-918: Server-Side Request Forgery (SSRF)
+app.get('/proxy-cwe918', (req, res) => {
+  const targetUrl = req.query.url;
+  // ⚠️ CWE-918: SSRF - fetching arbitrary URLs
+  https.get(targetUrl, (response) => {
+    let data = '';
+    response.on('data', (chunk) => { data += chunk; });
+    response.on('end', () => { res.send(data); });
+  }).on('error', (err) => {
+    res.status(500).json({ error: err.message });
+  });
+});
+
+app.post('/webhook-cwe918', (req, res) => {
+  const webhookUrl = req.body.webhook_url;
+  const payload = req.body.payload;
+  // ⚠️ CWE-918: SSRF via webhook without URL validation
+  const postData = JSON.stringify(payload);
+  const urlObj = new URL(webhookUrl);
+  const options = {
+    hostname: urlObj.hostname,
+    port: urlObj.port || 443,
+    path: urlObj.pathname,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': postData.length
+    }
+  };
+  const request = https.request(options, (response) => {
+    let data = '';
+    response.on('data', (chunk) => { data += chunk; });
+    response.on('end', () => { res.json({ response: data }); });
+  });
+  request.on('error', (err) => {
+    res.status(500).json({ error: err.message });
+  });
+  request.write(postData);
+  request.end();
+});
+
+app.get('/fetch-image-cwe918', (req, res) => {
+  const imageUrl = req.query.image;
+  // ⚠️ CWE-918: SSRF allowing access to internal resources
+  https.get(imageUrl, (response) => {
+    res.setHeader('Content-Type', response.headers['content-type']);
+    response.pipe(res);
+  }).on('error', (err) => {
+    res.status(500).json({ error: err.message });
+  });
+});
+
+app.post('/api-forward-cwe918', (req, res) => {
+  const apiEndpoint = req.body.endpoint;
+  const method = req.body.method || 'GET';
+  // ⚠️ CWE-918: Open proxy forwarding requests
+  const urlObj = new URL(apiEndpoint);
+  const options = {
+    hostname: urlObj.hostname,
+    port: urlObj.port,
+    path: urlObj.pathname + urlObj.search,
+    method: method
+  };
+  https.request(options, (response) => {
+    let data = '';
+    response.on('data', (chunk) => { data += chunk; });
+    response.on('end', () => { res.json({ data }); });
+  }).end();
+});
+
+app.get('/metadata-cwe918', (req, res) => {
+  const serviceUrl = req.query.service;
+  // ⚠️ CWE-918: SSRF to cloud metadata endpoints
+  // Could access http://169.254.169.254/latest/meta-data/
+  https.get(serviceUrl, (response) => {
+    let metadata = '';
+    response.on('data', (chunk) => { metadata += chunk; });
+    response.on('end', () => { res.json({ metadata }); });
+  }).on('error', (err) => {
+    res.status(500).json({ error: err.message });
+  });
 });
 
 // 404 handler
