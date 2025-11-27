@@ -1541,6 +1541,857 @@ app.post('/update-user', (req, res) => {
   res.json({ user });
 });
 
+// CWE-209: Information exposure through error message
+app.get('/db-error', (req, res) => {
+  const userId = req.query.id;
+  try {
+    // ⚠️ CWE-209: js/information-exposure-through-error - Exposing system information
+    throw new Error(`Database connection failed: mysql://admin:password@localhost:3306/userdb - User ID: ${userId}`);
+  } catch (err) {
+    res.status(500).json({ error: err.message, stack: err.stack });
+  }
+});
+
+// CWE-611: Improper restriction of XML external entity reference
+app.post('/parse-xml-entity', (req, res) => {
+  const xmlData = req.body.xml;
+  // ⚠️ CWE-611: js/xxe - XXE vulnerability
+  const libxmljs = require('libxmljs');
+  const xmlDoc = libxmljs.parseXml(xmlData, { dtdload: true, dtdvalid: true, noent: true });
+  res.json({ parsed: xmlDoc.toString() });
+});
+
+// CWE-256: Unprotected storage of credentials
+app.post('/save-credentials', (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  // ⚠️ CWE-256: js/clear-text-storage-of-sensitive-data - Storing credentials in plaintext
+  fs.writeFileSync('user-credentials.json', JSON.stringify({ username, password }));
+  res.json({ saved: true });
+});
+
+// CWE-835: Loop with unreachable exit condition
+app.get('/infinite-loop', (req, res) => {
+  const max = parseInt(req.query.max);
+  let counter = 0;
+  // ⚠️ CWE-835: js/unreachable-loop-exit - Infinite loop vulnerability
+  while (counter < max) {
+    if (counter === -1) {
+      break;
+    }
+    counter--;
+  }
+  res.json({ counter });
+});
+
+// CWE-297: Improper validation of certificate with host mismatch
+app.get('/tls-no-verify', (req, res) => {
+  const url = req.query.url;
+  // ⚠️ CWE-297: js/disabling-certificate-validation - Certificate validation disabled
+  const options = {
+    rejectUnauthorized: false,
+    checkServerIdentity: () => undefined
+  };
+  https.get(url, options, (response) => {
+    res.json({ status: response.statusCode });
+  });
+});
+
+// CWE-113: HTTP response splitting
+app.get('/set-location', (req, res) => {
+  const redirectUrl = req.query.url;
+  // ⚠️ CWE-113: js/http-response-splitting - HTTP response splitting
+  res.setHeader('Location', redirectUrl);
+  res.status(302).send();
+});
+
+// CWE-918: Server-side request forgery with DNS
+app.get('/dns-lookup', (req, res) => {
+  const hostname = req.query.hostname;
+  // ⚠️ CWE-918: js/request-forgery - SSRF through DNS lookup
+  dns.resolve4(hostname, (err, addresses) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json({ addresses });
+    }
+  });
+});
+
+// CWE-384: Session fixation
+app.get('/reuse-session', (req, res) => {
+  const oldSession = req.query.sessionId;
+  // ⚠️ CWE-384: js/session-fixation - Session fixation vulnerability
+  res.cookie('SESSIONID', oldSession, { httpOnly: true });
+  res.json({ message: 'Session reused', sessionId: oldSession });
+});
+
+// CWE-522: Insufficiently protected credentials
+app.post('/weak-auth', (req, res) => {
+  const authHeader = req.headers.authorization;
+  // ⚠️ CWE-522: js/insufficient-credential-protection - Weak credential protection
+  if (authHeader) {
+    const credentials = Buffer.from(authHeader.split(' ')[1], 'base64').toString();
+    console.log(`Received credentials: ${credentials}`);
+    res.json({ authenticated: true });
+  }
+});
+
+// CWE-470: Use of externally-controlled input to select classes or code
+app.get('/load-module', (req, res) => {
+  const moduleName = req.query.module;
+  // ⚠️ CWE-470: js/unsafe-dynamic-method-access - Unsafe module loading
+  try {
+    const loadedModule = require(moduleName);
+    res.json({ loaded: true, module: moduleName });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// CWE-120: Buffer overflow through string concatenation
+app.post('/buffer-overflow', (req, res) => {
+  const input = req.body.input;
+  // ⚠️ CWE-120: Buffer overflow vulnerability
+  let buffer = '';
+  for (let i = 0; i < 1000000; i++) {
+    buffer += input;
+  }
+  res.json({ length: buffer.length });
+});
+
+// CWE-190: Integer overflow
+app.get('/calculate-size', (req, res) => {
+  const size = parseInt(req.query.size);
+  // ⚠️ CWE-190: js/integer-overflow - Integer overflow
+  const totalSize = size * 1024 * 1024 * 1024;
+  res.json({ totalSize });
+});
+
+// CWE-191: Integer underflow
+app.get('/subtract-values', (req, res) => {
+  const a = parseInt(req.query.a);
+  const b = parseInt(req.query.b);
+  // ⚠️ CWE-191: Integer underflow
+  const result = a - b;
+  const arr = new Array(result);
+  res.json({ arraySize: arr.length });
+});
+
+// CWE-203: Observable timing discrepancy
+app.post('/check-password', (req, res) => {
+  const password = req.body.password;
+  const correctPassword = 'SuperSecret123!';
+  // ⚠️ CWE-203: js/timing-attack - Timing attack vulnerability
+  for (let i = 0; i < password.length; i++) {
+    if (password[i] !== correctPassword[i]) {
+      return res.json({ valid: false });
+    }
+  }
+  res.json({ valid: password.length === correctPassword.length });
+});
+
+// CWE-215: Information exposure through debug information
+app.get('/debug-info', (req, res) => {
+  // ⚠️ CWE-215: js/information-exposure - Debug information exposure
+  res.json({
+    nodeVersion: process.version,
+    platform: process.platform,
+    env: process.env,
+    cwd: process.cwd(),
+    memoryUsage: process.memoryUsage()
+  });
+});
+
+// CWE-223: Omission of security-relevant information
+app.post('/audit-action', (req, res) => {
+  const action = req.body.action;
+  // ⚠️ CWE-223: Missing security audit logging
+  // No logging of security-relevant action
+  res.json({ executed: true });
+});
+
+// CWE-241: Improper handling of unexpected data type
+app.post('/process-amount', (req, res) => {
+  const amount = req.body.amount;
+  // ⚠️ CWE-241: js/type-confusion - No type validation
+  const total = amount + 100;
+  res.json({ total });
+});
+
+// CWE-250: Execution with unnecessary privileges
+app.get('/run-privileged', (req, res) => {
+  const command = req.query.cmd;
+  // ⚠️ CWE-250: Running command with elevated privileges
+  exec(command, { uid: 0 }, (err, stdout) => {
+    res.send(stdout);
+  });
+});
+
+// CWE-252: Unchecked return value
+app.post('/write-data', (req, res) => {
+  const data = req.body.data;
+  // ⚠️ CWE-252: js/unchecked-return-value - Ignoring return value
+  fs.writeFile('data.txt', data, () => {});
+  res.json({ written: true });
+});
+
+// CWE-272: Least privilege violation
+app.get('/admin-action', (req, res) => {
+  // ⚠️ CWE-272: js/insufficient-privilege-check
+  // No privilege check before admin action
+  const result = exec('rm -rf /tmp/*');
+  res.json({ cleaned: true });
+});
+
+// CWE-276: Incorrect default permissions
+app.post('/create-config', (req, res) => {
+  const config = req.body.config;
+  // ⚠️ CWE-276: js/incorrect-default-permissions - World-writable file
+  fs.writeFileSync('config.json', JSON.stringify(config), { mode: 0o666 });
+  res.json({ created: true });
+});
+
+// CWE-280: Improper handling of insufficient permissions
+app.get('/read-protected', (req, res) => {
+  const file = req.query.file;
+  // ⚠️ CWE-280: js/insufficient-permission-check
+  fs.readFile(file, 'utf8', (err, data) => {
+    if (err) {
+      res.json({ error: 'Cannot read file' });
+    } else {
+      res.send(data);
+    }
+  });
+});
+
+// CWE-287: Improper authentication
+app.post('/quick-login', (req, res) => {
+  const username = req.body.username;
+  // ⚠️ CWE-287: js/improper-authentication - No password check
+  res.cookie('user', username);
+  res.json({ authenticated: true });
+});
+
+// CWE-288: Authentication bypass using alternate path
+app.get('/admin-alt', (req, res) => {
+  // ⚠️ CWE-288: js/authentication-bypass - Alternate path bypass
+  // Bypasses normal authentication
+  res.json({ adminAccess: true, data: 'sensitive' });
+});
+
+// CWE-290: Authentication bypass by spoofing
+app.get('/trusted-request', (req, res) => {
+  const ipAddress = req.headers['x-forwarded-for'];
+  // ⚠️ CWE-290: js/ip-address-spoofing - Trusting IP from header
+  if (ipAddress === '127.0.0.1') {
+    res.json({ trusted: true, access: 'granted' });
+  }
+});
+
+// CWE-294: Authentication bypass by capture-replay
+app.post('/replay-auth', (req, res) => {
+  const authToken = req.body.token;
+  // ⚠️ CWE-294: js/authentication-replay - No replay protection
+  if (authToken) {
+    res.json({ authenticated: true });
+  }
+});
+
+// CWE-296: Improper certificate validation
+app.get('/verify-cert', (req, res) => {
+  const url = req.query.url;
+  // ⚠️ CWE-296: js/improper-certificate-validation
+  const agent = new https.Agent({ rejectUnauthorized: false });
+  https.get(url, { agent }, (response) => {
+    res.json({ connected: true });
+  });
+});
+
+// CWE-298: Improper validation of certificate expiration
+app.get('/old-cert-ok', (req, res) => {
+  // ⚠️ CWE-298: js/expired-certificate-accepted
+  const options = {
+    rejectUnauthorized: true,
+    checkServerIdentity: () => undefined
+  };
+  res.json({ config: options });
+});
+
+// CWE-299: Improper check for certificate revocation
+app.get('/no-crl-check', (req, res) => {
+  // ⚠️ CWE-299: js/certificate-revocation-not-checked
+  const tlsOptions = {
+    rejectUnauthorized: true
+    // Missing CRL check
+  };
+  res.json({ tlsOptions });
+});
+
+// CWE-306: Missing authentication
+app.get('/sensitive-endpoint', (req, res) => {
+  // ⚠️ CWE-306: js/missing-authentication - No authentication required
+  res.json({ 
+    users: ['admin', 'user1', 'user2'],
+    passwords: ['pass123', 'pass456', 'pass789']
+  });
+});
+
+// CWE-307: Improper restriction of excessive authentication attempts
+app.post('/unlimited-login', (req, res) => {
+  const password = req.body.password;
+  // ⚠️ CWE-307: js/no-rate-limiting - No rate limiting
+  if (password === 'secret') {
+    res.json({ success: true });
+  } else {
+    res.json({ success: false });
+  }
+});
+
+// CWE-311: Missing encryption of sensitive data
+app.post('/send-ssn', (req, res) => {
+  const ssn = req.body.ssn;
+  // ⚠️ CWE-311: js/missing-encryption - Sending sensitive data unencrypted
+  const http = require('http');
+  http.get(`http://api.example.com/store?ssn=${ssn}`);
+  res.json({ sent: true });
+});
+
+// CWE-313: Cleartext storage in a file
+app.post('/store-api-key', (req, res) => {
+  const apiKey = req.body.apiKey;
+  // ⚠️ CWE-313: js/cleartext-storage - Cleartext storage of API key
+  fs.writeFileSync('api-keys.txt', `API_KEY=${apiKey}\n`, { flag: 'a' });
+  res.json({ stored: true });
+});
+
+// CWE-314: Cleartext storage in the registry
+app.post('/store-in-env', (req, res) => {
+  const secret = req.body.secret;
+  // ⚠️ CWE-314: js/cleartext-storage-environment - Cleartext in environment
+  process.env.SECRET_KEY = secret;
+  res.json({ stored: true });
+});
+
+// CWE-315: Cleartext storage in a cookie
+app.post('/store-credit-card', (req, res) => {
+  const cardNumber = req.body.cardNumber;
+  // ⚠️ CWE-315: js/cleartext-cookie - Cleartext sensitive data in cookie
+  res.cookie('cc', cardNumber);
+  res.json({ stored: true });
+});
+
+// CWE-321: Use of hard-coded cryptographic key
+const ENCRYPTION_KEY = '0123456789abcdef0123456789abcdef';
+// ⚠️ CWE-321: js/hardcoded-key - Hardcoded encryption key
+
+app.post('/encrypt-data', (req, res) => {
+  const data = req.body.data;
+  const cipher = crypto.createCipher('aes-256-cbc', ENCRYPTION_KEY);
+  const encrypted = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
+  res.json({ encrypted });
+});
+
+// CWE-322: Key exchange without entity authentication
+app.post('/exchange-key', (req, res) => {
+  const publicKey = req.body.publicKey;
+  // ⚠️ CWE-322: js/unauthenticated-key-exchange - No authentication
+  const sharedSecret = crypto.randomBytes(32).toString('hex');
+  res.json({ sharedSecret });
+});
+
+// CWE-323: Reusing a nonce with encryption
+app.post('/encrypt-multiple', (req, res) => {
+  const messages = req.body.messages;
+  const key = crypto.randomBytes(32);
+  const nonce = crypto.randomBytes(12);
+  // ⚠️ CWE-323: js/nonce-reuse - Reusing nonce
+  const encrypted = messages.map(msg => {
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, nonce);
+    return cipher.update(msg, 'utf8', 'hex') + cipher.final('hex');
+  });
+  res.json({ encrypted });
+});
+
+// CWE-324: Use of key past its expiration date
+const OLD_KEY = 'expired-key-from-2020';
+// ⚠️ CWE-324: js/expired-key-usage
+
+app.post('/sign-expired', (req, res) => {
+  const data = req.body.data;
+  const signature = crypto.createHmac('sha256', OLD_KEY).update(data).digest('hex');
+  res.json({ signature });
+});
+
+// CWE-325: Missing required cryptographic step
+app.post('/incomplete-crypto', (req, res) => {
+  const data = req.body.data;
+  // ⚠️ CWE-325: js/incomplete-cryptographic-operation - Missing IV
+  const cipher = crypto.createCipher('aes-256-cbc', 'key');
+  const encrypted = cipher.update(data, 'utf8', 'hex');
+  // Missing cipher.final()
+  res.json({ encrypted });
+});
+
+// CWE-329: Not using a random IV with CBC mode
+app.post('/static-iv', (req, res) => {
+  const data = req.body.data;
+  const key = crypto.randomBytes(32);
+  const iv = Buffer.alloc(16, 0); // ⚠️ CWE-329: js/static-iv - Static IV
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+  const encrypted = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
+  res.json({ encrypted });
+});
+
+// CWE-331: Insufficient entropy
+app.get('/weak-token', (req, res) => {
+  // ⚠️ CWE-331: js/insufficient-entropy - Predictable token
+  const token = Date.now().toString() + Math.floor(Math.random() * 100);
+  res.json({ token });
+});
+
+// CWE-332: Insufficient entropy in PRNG
+app.get('/weak-random', (req, res) => {
+  // ⚠️ CWE-332: js/weak-prng - Weak PRNG for security
+  const sessionId = Math.random().toString(36) + Math.random().toString(36);
+  res.cookie('sessionId', sessionId);
+  res.json({ sessionId });
+});
+
+// CWE-333: Improper handling of insufficient entropy
+app.post('/generate-key', (req, res) => {
+  const seed = req.body.seed || Date.now();
+  // ⚠️ CWE-333: js/insufficient-entropy-seed - Predictable seed
+  const key = crypto.createHash('sha256').update(seed.toString()).digest('hex');
+  res.json({ key });
+});
+
+// CWE-334: Small space of random values
+app.get('/limited-random', (req, res) => {
+  // ⚠️ CWE-334: js/small-random-space - Small random space
+  const otp = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+  res.json({ otp });
+});
+
+// CWE-335: PRNG seed error
+app.get('/seed-time', (req, res) => {
+  // ⚠️ CWE-335: js/prng-seed-error - Time-based seed
+  const seed = new Date().getHours();
+  const random = crypto.createHash('md5').update(seed.toString()).digest('hex');
+  res.json({ random });
+});
+
+// CWE-336: Same seed in PRNG
+const STATIC_SEED = 12345;
+// ⚠️ CWE-336: js/static-seed
+
+app.get('/seeded-random', (req, res) => {
+  const value = crypto.createHash('sha1').update(STATIC_SEED.toString()).digest('hex');
+  res.json({ value });
+});
+
+// CWE-337: Predictable seed in PRNG
+app.get('/predictable-seed', (req, res) => {
+  const seed = req.query.userId || '1';
+  // ⚠️ CWE-337: js/predictable-seed - User-controlled seed
+  const token = crypto.createHash('md5').update(seed).digest('hex');
+  res.json({ token });
+});
+
+// CWE-339: Small PRNG period
+app.get('/small-period', (req, res) => {
+  // ⚠️ CWE-339: js/small-prng-period - Limited random values
+  const value = (Math.random() * 10) | 0;
+  res.json({ value });
+});
+
+// CWE-341: Predictable from observable state
+app.get('/observable-state', (req, res) => {
+  // ⚠️ CWE-341: js/observable-state - State-based randomness
+  const state = process.uptime();
+  const token = crypto.createHash('md5').update(state.toString()).digest('hex');
+  res.json({ token });
+});
+
+// CWE-342: Predictable exact value from previous values
+let lastRandom = 12345;
+app.get('/sequential-random', (req, res) => {
+  // ⚠️ CWE-342: js/sequential-random - Sequential values
+  lastRandom = (lastRandom + 1) % 1000000;
+  res.json({ value: lastRandom });
+});
+
+// CWE-343: Predictable value range
+app.get('/limited-range', (req, res) => {
+  // ⚠️ CWE-343: js/limited-random-range - Limited range
+  const pin = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  res.json({ pin });
+});
+
+// CWE-344: Use of invariant value in authentication
+const STATIC_TOKEN = 'auth-token-12345';
+// ⚠️ CWE-344: js/static-authentication-token
+
+app.post('/static-auth', (req, res) => {
+  const token = req.body.token;
+  if (token === STATIC_TOKEN) {
+    res.json({ authenticated: true });
+  }
+});
+
+// CWE-346: Origin validation error
+app.get('/cors-origin', (req, res) => {
+  const origin = req.headers.origin;
+  // ⚠️ CWE-346: js/improper-origin-validation - Weak origin check
+  if (origin && origin.includes('example.com')) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.json({ data: 'sensitive' });
+  }
+});
+
+// CWE-348: Use of less trusted source
+app.get('/forwarded-host', (req, res) => {
+  const host = req.headers['x-forwarded-host'];
+  // ⚠️ CWE-348: js/untrusted-forwarded-host - Trusting X-Forwarded-Host
+  res.json({ redirectTo: `https://${host}/callback` });
+});
+
+// CWE-349: Acceptance of extraneous untrusted data
+app.post('/merge-data', (req, res) => {
+  const baseData = { role: 'user', permissions: [] };
+  const userData = req.body;
+  // ⚠️ CWE-349: js/extraneous-data - Accepting extra fields
+  const merged = { ...baseData, ...userData };
+  res.json({ merged });
+});
+
+// CWE-350: Reliance on reverse DNS
+app.get('/reverse-dns', (req, res) => {
+  const ip = req.ip;
+  // ⚠️ CWE-350: js/reverse-dns-trust - Trusting reverse DNS
+  dns.reverse(ip, (err, hostnames) => {
+    if (hostnames && hostnames[0].includes('trusted.com')) {
+      res.json({ trusted: true });
+    }
+  });
+});
+
+// CWE-353: Missing integrity check
+app.post('/upload-plugin', (req, res) => {
+  const pluginData = req.body.plugin;
+  // ⚠️ CWE-353: js/missing-integrity-check - No integrity verification
+  fs.writeFileSync('plugins/plugin.js', pluginData);
+  require('./plugins/plugin.js');
+  res.json({ loaded: true });
+});
+
+// CWE-354: Improper validation of integrity check
+app.post('/verify-checksum', (req, res) => {
+  const data = req.body.data;
+  const checksum = req.body.checksum;
+  // ⚠️ CWE-354: js/weak-integrity-check - Weak checksum (MD5)
+  const calculated = crypto.createHash('md5').update(data).digest('hex');
+  if (calculated === checksum) {
+    res.json({ valid: true });
+  }
+});
+
+// CWE-356: Product UI does not warn user of unsafe actions
+app.post('/dangerous-action', (req, res) => {
+  const action = req.body.action;
+  // ⚠️ CWE-356: js/no-warning - No warning for dangerous action
+  if (action === 'delete-all') {
+    exec('rm -rf /tmp/*');
+  }
+  res.json({ executed: true });
+});
+
+// CWE-358: Improperly implemented security check
+app.get('/bypass-check', (req, res) => {
+  const isAdmin = req.query.admin;
+  // ⚠️ CWE-358: js/improper-security-check - Flawed check
+  if (isAdmin != false) { // Using != instead of !==
+    res.json({ adminAccess: true });
+  }
+});
+
+// CWE-360: Trust of system event data
+app.post('/trust-event', (req, res) => {
+  const event = req.body.event;
+  // ⚠️ CWE-360: js/trust-system-event - Trusting event data
+  if (event.source === 'system') {
+    exec(event.command);
+  }
+  res.json({ processed: true });
+});
+
+// CWE-362: Concurrent execution using shared resource
+let sharedCounter = 0;
+app.post('/increment', (req, res) => {
+  // ⚠️ CWE-362: js/race-condition - Race condition
+  const current = sharedCounter;
+  setTimeout(() => {
+    sharedCounter = current + 1;
+  }, 10);
+  res.json({ value: sharedCounter });
+});
+
+// CWE-363: Race condition enabling link following
+app.post('/symlink-race', (req, res) => {
+  const target = req.body.target;
+  // ⚠️ CWE-363: js/symlink-race - TOCTOU with symlinks
+  if (fs.existsSync(target)) {
+    fs.readFileSync(target);
+  }
+  res.json({ read: true });
+});
+
+// CWE-364: Signal handler race condition
+app.get('/signal-race', (req, res) => {
+  // ⚠️ CWE-364: js/signal-handler-race - Signal handler race
+  process.on('SIGTERM', () => {
+    fs.writeFileSync('state.json', JSON.stringify({ shutdown: true }));
+  });
+  res.json({ registered: true });
+});
+
+// CWE-365: Race condition in switch
+let state = 'initial';
+app.post('/switch-state', (req, res) => {
+  const newState = req.body.state;
+  // ⚠️ CWE-365: js/switch-race - Race in state change
+  if (state === 'initial') {
+    setTimeout(() => {
+      state = newState;
+    }, 10);
+  }
+  res.json({ state });
+});
+
+// CWE-366: Race condition within a thread
+let balance = 1000;
+app.post('/withdraw', (req, res) => {
+  const amount = parseInt(req.body.amount);
+  // ⚠️ CWE-366: js/thread-race - Race condition
+  if (balance >= amount) {
+    setTimeout(() => {
+      balance -= amount;
+    }, 10);
+    res.json({ balance });
+  }
+});
+
+// CWE-368: Context switching race condition
+let contextData = {};
+app.post('/context-switch', (req, res) => {
+  const key = req.body.key;
+  const value = req.body.value;
+  // ⚠️ CWE-368: js/context-race - Context switching race
+  contextData[key] = value;
+  setTimeout(() => {
+    delete contextData[key];
+  }, 100);
+  res.json({ stored: true });
+});
+
+// CWE-370: Missing check for certificate revocation
+app.get('/no-ocsp', (req, res) => {
+  // ⚠️ CWE-370: js/no-ocsp-check - No OCSP checking
+  const options = {
+    rejectUnauthorized: true
+    // Missing OCSP configuration
+  };
+  res.json({ options });
+});
+
+// CWE-372: Incomplete internal state distinction
+let loginAttempts = {};
+app.post('/track-login', (req, res) => {
+  const username = req.body.username;
+  // ⚠️ CWE-372: js/incomplete-state - Not distinguishing IP/user
+  loginAttempts[username] = (loginAttempts[username] || 0) + 1;
+  res.json({ attempts: loginAttempts[username] });
+});
+
+// CWE-373: CERT C secure coding standard violation
+app.get('/buffer-issue', (req, res) => {
+  const input = req.query.input;
+  // ⚠️ CWE-373: js/cert-violation - Unsafe string operation
+  let result = '';
+  for (let i = 0; i < 1000000; i++) {
+    result += input;
+  }
+  res.json({ length: result.length });
+});
+
+// CWE-374: Passing mutable objects to untrusted method
+const configData = { apiKey: 'secret123', debug: false };
+app.post('/process-config', (req, res) => {
+  const processor = req.body.processor;
+  // ⚠️ CWE-374: js/mutable-object-pass - Passing mutable config
+  const result = eval(processor)(configData);
+  res.json({ result });
+});
+
+// CWE-375: Returning mutable object to untrusted caller
+const internalState = { secrets: ['key1', 'key2'], users: [] };
+app.get('/get-state', (req, res) => {
+  // ⚠️ CWE-375: js/return-mutable - Returning internal state
+  res.json(internalState);
+});
+
+// CWE-376: Temporary file issues
+app.post('/temp-file-race', (req, res) => {
+  const data = req.body.data;
+  // ⚠️ CWE-376: js/temp-file-race - Predictable temp file
+  const tmpFile = `/tmp/app-${process.pid}.tmp`;
+  fs.writeFileSync(tmpFile, data);
+  res.json({ file: tmpFile });
+});
+
+// CWE-379: Creation of temporary file in directory with insecure permissions
+app.post('/insecure-tmp', (req, res) => {
+  const data = req.body.data;
+  // ⚠️ CWE-379: js/insecure-temp-dir - Insecure temp directory
+  const tmpFile = '/tmp/shared/' + Date.now() + '.tmp';
+  fs.writeFileSync(tmpFile, data, { mode: 0o666 });
+  res.json({ file: tmpFile });
+});
+
+// CWE-382: J2EE bad practices: use of System.exit()
+app.get('/force-exit', (req, res) => {
+  const code = parseInt(req.query.code) || 0;
+  // ⚠️ CWE-382: js/process-exit - Improper process exit
+  process.exit(code);
+});
+
+// CWE-383: J2EE bad practices: direct use of threads
+app.get('/spawn-thread', (req, res) => {
+  const Worker = require('worker_threads').Worker;
+  // ⚠️ CWE-383: js/direct-thread-spawn - Direct thread creation
+  const worker = new Worker('./worker.js');
+  res.json({ spawned: true });
+});
+
+// CWE-385: Covert timing channel
+app.post('/timing-leak', (req, res) => {
+  const secret = 'MySecretValue123';
+  const guess = req.body.guess;
+  let matches = 0;
+  // ⚠️ CWE-385: js/timing-leak - Timing side channel
+  for (let i = 0; i < secret.length; i++) {
+    if (secret[i] === guess[i]) {
+      matches++;
+      // Timing leak through processing time
+      crypto.pbkdf2Sync('data', 'salt', 10000, 64, 'sha512');
+    }
+  }
+  res.json({ matches });
+});
+
+// CWE-388: Error handling
+app.get('/catch-all', (req, res) => {
+  try {
+    const data = JSON.parse(req.query.data);
+    res.json(data);
+  } catch (e) {
+    // ⚠️ CWE-388: js/catch-all-error - Overly broad catch
+    res.json({ error: 'Something went wrong' });
+  }
+});
+
+// CWE-390: Detection of error condition without action
+app.post('/ignore-error', (req, res) => {
+  const file = req.body.file;
+  // ⚠️ CWE-390: js/error-without-action - Error detected but ignored
+  fs.readFile(file, (err, data) => {
+    if (err) {
+      // Error detected but no action taken
+    }
+    res.json({ data: data ? data.toString() : null });
+  });
+});
+
+// CWE-391: Unchecked error condition
+app.post('/no-error-check', (req, res) => {
+  const sql = req.body.sql;
+  // ⚠️ CWE-391: js/unchecked-error - No error checking
+  exec(`sqlite3 db.sqlite "${sql}"`);
+  res.json({ executed: true });
+});
+
+// CWE-392: Missing report of error condition
+app.post('/silent-failure', (req, res) => {
+  const operation = req.body.operation;
+  // ⚠️ CWE-392: js/silent-error - Error not reported
+  try {
+    eval(operation);
+  } catch (e) {
+    // Silent failure
+  }
+  res.json({ done: true });
+});
+
+// CWE-393: Return of wrong status code
+app.get('/wrong-status', (req, res) => {
+  const file = req.query.file;
+  // ⚠️ CWE-393: js/wrong-status-code - Incorrect status code
+  fs.readFile(file, (err, data) => {
+    if (err) {
+      res.status(200).json({ error: 'File not found' });
+    } else {
+      res.send(data);
+    }
+  });
+});
+
+// CWE-394: Unexpected status code or value
+app.get('/unexpected-return', (req, res) => {
+  const value = parseInt(req.query.value);
+  // ⚠️ CWE-394: js/unexpected-status - Not handling all cases
+  if (value > 0) {
+    res.json({ positive: true });
+  } else if (value < 0) {
+    res.json({ negative: true });
+  }
+  // Missing case for value === 0
+});
+
+// CWE-395: Use of NullPointerException catch
+app.post('/null-catch', (req, res) => {
+  try {
+    const obj = req.body.obj;
+    const value = obj.property.subproperty;
+    res.json({ value });
+  } catch (e) {
+    // ⚠️ CWE-395: js/null-pointer-catch - Catching null/undefined
+    if (e instanceof TypeError) {
+      res.json({ error: 'null reference' });
+    }
+  }
+});
+
+// CWE-396: Declaration of catch for generic exception
+app.get('/generic-catch', (req, res) => {
+  try {
+    const data = JSON.parse(req.query.json);
+    res.json(data);
+  } catch (err) {
+    // ⚠️ CWE-396: js/generic-exception-catch - Too generic
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// CWE-397: Declaration of throws for generic exception
+app.get('/throw-generic', (req, res) => {
+  const condition = req.query.condition;
+  // ⚠️ CWE-397: js/generic-throw - Generic error throw
+  if (!condition) {
+    throw new Error('Generic error');
+  }
+  res.json({ ok: true });
+});
+
 // Server start
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
