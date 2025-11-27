@@ -753,6 +753,202 @@ app.use('*', (req, res) => {
   });
 });
 
+// CWE-79: Cross-Site Scripting (XSS)
+app.get('/search-xss', (req, res) => {
+  const query = req.query.q;
+  // ⚠️ CWE-79: Reflected XSS - no output encoding
+  res.send(`<h1>Search Results for: ${query}</h1><p>No results found</p>`);
+});
+
+app.post('/comment-xss', (req, res) => {
+  const comment = req.body.comment;
+  // ⚠️ CWE-79: Stored XSS vulnerability
+  global.comments = global.comments || [];
+  global.comments.push(comment);
+  res.send(`<div>Comment added: ${comment}</div>`);
+});
+
+// CWE-287: Improper Authentication
+app.post('/admin-access', (req, res) => {
+  const username = req.body.username;
+  const isAdmin = req.body.isAdmin;
+  // ⚠️ CWE-287: Authentication bypass - trusting client data
+  if (isAdmin === 'true' || isAdmin === true) {
+    res.json({ access: 'granted', role: 'admin' });
+  } else {
+    res.json({ access: 'denied' });
+  }
+});
+
+app.get('/weak-session', (req, res) => {
+  const userId = req.query.user;
+  // ⚠️ CWE-287: Weak session management - predictable session IDs
+  const sessionId = userId + '_' + Date.now();
+  res.json({ sessionId, message: 'Logged in' });
+});
+
+// CWE-89: SQL Injection
+app.get('/user-sql', (req, res) => {
+  const userId = req.query.id;
+  // ⚠️ CWE-89: SQL Injection vulnerability
+  const query = `SELECT * FROM users WHERE id = '${userId}'`;
+  res.json({ query, warning: 'This would execute: ' + query });
+});
+
+app.post('/login-sql', (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  // ⚠️ CWE-89: SQL Injection in authentication
+  const query = `SELECT * FROM users WHERE username='${username}' AND password='${password}'`;
+  res.json({ query, message: 'SQL query would be executed' });
+});
+
+// CWE-352: Cross-Site Request Forgery (CSRF)
+app.post('/transfer-money', (req, res) => {
+  const amount = req.body.amount;
+  const toAccount = req.body.to;
+  // ⚠️ CWE-352: No CSRF token validation
+  res.json({ 
+    message: `Transferred $${amount} to account ${toAccount}`,
+    warning: 'No CSRF protection'
+  });
+});
+
+app.post('/delete-account', (req, res) => {
+  const accountId = req.body.accountId;
+  // ⚠️ CWE-352: State-changing operation without CSRF protection
+  res.json({ message: `Account ${accountId} deleted`, csrf: 'missing' });
+});
+
+// CWE-434: Unrestricted Upload of File with Dangerous Type
+app.post('/upload-file', (req, res) => {
+  const filename = req.body.filename;
+  const content = req.body.content;
+  // ⚠️ CWE-434: No file type validation
+  const uploadPath = './uploads/' + filename;
+  fs.writeFileSync(uploadPath, content);
+  res.json({ message: 'File uploaded', path: uploadPath });
+});
+
+app.post('/avatar-upload', (req, res) => {
+  const file = req.body.file;
+  const extension = req.body.extension;
+  // ⚠️ CWE-434: Accepting dangerous file extensions
+  const filename = 'avatar_' + Date.now() + extension;
+  res.json({ uploaded: filename, warning: 'No extension validation' });
+});
+
+// CWE-611: Improper Restriction of XML External Entity Reference (XXE)
+app.post('/parse-xml', (req, res) => {
+  const xml = req.body.xml;
+  // ⚠️ CWE-611: XXE vulnerability - external entities enabled
+  const parseString = require('xml2js').parseString;
+  parseString(xml, { 
+    async: false,
+    // External entities not disabled
+  }, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.json({ parsed: result });
+    }
+  });
+});
+
+app.post('/soap-request', (req, res) => {
+  const soapXml = req.body.soap;
+  // ⚠️ CWE-611: Processing untrusted XML with external entities
+  res.json({ message: 'SOAP request processed', xml: soapXml });
+});
+
+// CWE-798: Use of Hard-coded Credentials
+app.get('/db-config', (req, res) => {
+  // ⚠️ CWE-798: Hardcoded database credentials
+  const dbConfig = {
+    host: 'localhost',
+    user: 'admin',
+    password: 'P@ssw0rd123',
+    database: 'production_db',
+    apiKey: 'sk-live-1234567890abcdef',
+    awsAccessKey: 'AKIAIOSFODNN7EXAMPLE',
+    privateKey: '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...'
+  };
+  res.json(dbConfig);
+});
+
+app.get('/service-auth', (req, res) => {
+  // ⚠️ CWE-798: Hardcoded service credentials
+  const credentials = {
+    smtpPassword: 'email_pass_2024',
+    ftpPassword: 'ftp123456',
+    adminToken: 'bearer_token_12345'
+  };
+  res.json(credentials);
+});
+
+// CWE-776: Improper Restriction of Recursive Entity References in DTDs (XML Bomb)
+app.post('/xml-bomb', (req, res) => {
+  const xmlData = req.body.xml;
+  // ⚠️ CWE-776: Vulnerable to XML bomb/billion laughs attack
+  const parser = require('xml2js');
+  parser.parseString(xmlData, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.json({ parsed: result });
+    }
+  });
+});
+
+app.post('/expand-entities', (req, res) => {
+  const xml = req.body.data;
+  // ⚠️ CWE-776: Unlimited entity expansion
+  res.json({ message: 'Processing XML with entity expansion', data: xml });
+});
+
+// CWE-400: Uncontrolled Resource Consumption
+app.post('/process-array', (req, res) => {
+  const size = req.body.size;
+  // ⚠️ CWE-400: No limit on array size - DoS vulnerability
+  const arr = new Array(parseInt(size));
+  for (let i = 0; i < size; i++) {
+    arr[i] = Math.random();
+  }
+  res.json({ processed: arr.length });
+});
+
+app.get('/recursive-operation', (req, res) => {
+  const depth = parseInt(req.query.depth);
+  // ⚠️ CWE-400: Uncontrolled recursion
+  function recurse(n) {
+    if (n <= 0) return 1;
+    return n * recurse(n - 1);
+  }
+  const result = recurse(depth);
+  res.json({ result });
+});
+
+// CWE-732: Incorrect Permission Assignment for Critical Resource
+app.post('/create-file-permissions', (req, res) => {
+  const filename = req.body.filename;
+  const content = req.body.content;
+  // ⚠️ CWE-732: World-writable file permissions
+  const filePath = './data/' + filename;
+  fs.writeFileSync(filePath, content, { mode: 0o777 });
+  res.json({ created: filePath, permissions: '777' });
+});
+
+app.get('/sensitive-file', (req, res) => {
+  // ⚠️ CWE-732: Exposing sensitive files without access control
+  const configPath = './config/secrets.json';
+  if (fs.existsSync(configPath)) {
+    const secrets = fs.readFileSync(configPath, 'utf8');
+    res.send(secrets);
+  } else {
+    res.json({ message: 'No secrets file found' });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
