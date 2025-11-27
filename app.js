@@ -1382,6 +1382,308 @@ app.get('/reset-password', (req, res) => {
   res.json({ message: 'Password reset', token, password });
 });
 
+// Common CodeQL Detectable Vulnerabilities
+
+// Hardcoded Secret Detection
+app.get('/github-api', (req, res) => {
+  // ⚠️ Hardcoded GitHub token
+  const githubToken = 'ghp_1234567890abcdefghijklmnopqrstuvwxyz12';
+  res.json({ token: githubToken });
+});
+
+app.get('/aws-keys', (req, res) => {
+  // ⚠️ Hardcoded AWS credentials
+  const awsConfig = {
+    accessKeyId: 'AKIAIOSFODNN7EXAMPLE',
+    secretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+    region: 'us-east-1'
+  };
+  res.json(awsConfig);
+});
+
+// Unvalidated Dynamic Method Call
+app.post('/call-method', (req, res) => {
+  const obj = {
+    getUserData: () => ({ user: 'admin' }),
+    deleteUser: () => ({ deleted: true })
+  };
+  const method = req.body.method;
+  // ⚠️ Unvalidated dynamic method invocation
+  const result = obj[method]();
+  res.json(result);
+});
+
+// Incomplete URL Substring Sanitization
+app.get('/validate-url', (req, res) => {
+  const url = req.query.url;
+  // ⚠️ Incomplete URL validation
+  if (url.startsWith('http://trusted.com')) {
+    res.redirect(url); // Can be bypassed with http://trusted.com.evil.com
+  }
+});
+
+// Incomplete Hostname Regexp
+app.get('/check-host', (req, res) => {
+  const host = req.query.host;
+  // ⚠️ Incomplete hostname validation
+  if (/^trusted\.com$/.test(host)) {
+    res.json({ valid: true }); // Doesn't check subdomains
+  }
+});
+
+// Double Escaping or Unescaping
+app.get('/decode-input', (req, res) => {
+  let input = req.query.data;
+  // ⚠️ Double decoding vulnerability
+  input = decodeURIComponent(input);
+  input = decodeURIComponent(input);
+  res.send(input);
+});
+
+// Uncontrolled Data in SQL Query
+app.get('/search-users', (req, res) => {
+  const searchTerm = req.query.q;
+  // ⚠️ SQL injection in LIKE clause
+  const query = `SELECT * FROM users WHERE name LIKE '%${searchTerm}%'`;
+  res.json({ query });
+});
+
+// Incomplete Multi-Character Sanitization
+app.get('/sanitize-path', (req, res) => {
+  let filePath = req.query.path;
+  // ⚠️ Incomplete sanitization (only removes one occurrence)
+  filePath = filePath.replace('../', '');
+  res.json({ sanitized: filePath });
+});
+
+// Missing Rate Limiting
+app.post('/verify-code', (req, res) => {
+  const code = req.body.code;
+  // ⚠️ No rate limiting on verification endpoint
+  if (code === '123456') {
+    res.json({ verified: true });
+  } else {
+    res.json({ verified: false });
+  }
+});
+
+// Polynomial Regular Expression
+app.get('/validate-input', (req, res) => {
+  const input = req.query.input;
+  // ⚠️ ReDoS: Polynomial regex
+  const regex = /^(a+)+$/;
+  const isValid = regex.test(input);
+  res.json({ valid: isValid });
+});
+
+// Exponential Backtracking Regex
+app.get('/parse-html', (req, res) => {
+  const html = req.query.html;
+  // ⚠️ ReDoS: Exponential backtracking
+  const regex = /<([a-z]+)([^>]*)>(.*?)<\/\1>/i;
+  const match = html.match(regex);
+  res.json({ parsed: match });
+});
+
+// Unclear Precedence of Nested Operators
+app.get('/calculate', (req, res) => {
+  const a = parseInt(req.query.a);
+  const b = parseInt(req.query.b);
+  const c = parseInt(req.query.c);
+  // ⚠️ Unclear operator precedence
+  const result = a + b * c / a - b + c;
+  res.json({ result });
+});
+
+// Use of Externally-Controlled Format String
+app.get('/log-message', (req, res) => {
+  const format = req.query.format;
+  const value = req.query.value;
+  // ⚠️ Format string vulnerability
+  const message = eval(`\`${format}\``);
+  console.log(message);
+  res.json({ logged: true });
+});
+
+// Client-Side Cross-Site Scripting
+app.get('/render-comment', (req, res) => {
+  const comment = req.query.comment;
+  // ⚠️ DOM-based XSS
+  res.send(`
+    <script>
+      document.getElementById('comment').innerHTML = '${comment}';
+    </script>
+    <div id="comment"></div>
+  `);
+});
+
+// Stored Cross-Site Scripting
+const comments = [];
+app.post('/add-comment', (req, res) => {
+  const comment = req.body.comment;
+  // ⚠️ Stored XSS
+  comments.push(comment);
+  res.json({ id: comments.length - 1 });
+});
+
+app.get('/show-comments', (req, res) => {
+  // ⚠️ Displaying unescaped user content
+  const html = comments.map(c => `<div>${c}</div>`).join('');
+  res.send(html);
+});
+
+// Reflected Cross-Site Scripting
+app.get('/error-page', (req, res) => {
+  const errorMsg = req.query.error;
+  // ⚠️ Reflected XSS
+  res.send(`<h1>Error: ${errorMsg}</h1>`);
+});
+
+// Improper Regular Expression
+app.get('/match-email', (req, res) => {
+  const email = req.query.email;
+  // ⚠️ Improper email regex
+  const regex = /\w+@\w+\.\w+/;
+  res.json({ valid: regex.test(email) });
+});
+
+// Uncontrolled Command Line
+app.post('/compress-file', (req, res) => {
+  const filename = req.body.filename;
+  // ⚠️ Command line injection
+  exec(`tar -czf archive.tar.gz ${filename}`, (err, stdout) => {
+    res.send(stdout);
+  });
+});
+
+// Type Confusion Through Parameter Tampering
+app.post('/set-price', (req, res) => {
+  let price = req.body.price;
+  // ⚠️ Type confusion vulnerability
+  if (price < 100) {
+    price = price * 0.9; // 10% discount
+  }
+  res.json({ finalPrice: price });
+});
+
+// Prototype Pollution via Assignment
+app.post('/merge-config', (req, res) => {
+  const config = {};
+  const userConfig = req.body;
+  // ⚠️ Prototype pollution
+  for (let key in userConfig) {
+    config[key] = userConfig[key];
+  }
+  res.json(config);
+});
+
+// Use of Password Hash With Insufficient Computational Effort
+app.post('/register', (req, res) => {
+  const password = req.body.password;
+  // ⚠️ Weak hashing algorithm
+  const hash = crypto.createHash('md5').update(password).digest('hex');
+  res.json({ hash });
+});
+
+// Insecure Randomness
+app.get('/generate-id', (req, res) => {
+  // ⚠️ Insecure random for security-critical function
+  const id = Math.random().toString(36).substr(2, 9);
+  res.json({ userId: id });
+});
+
+// Missing CSRF Protection
+app.post('/transfer', (req, res) => {
+  const to = req.body.to;
+  const amount = req.body.amount;
+  // ⚠️ State-changing operation without CSRF token
+  res.json({ transferred: amount, to });
+});
+
+// Insecure Direct Object Reference
+app.get('/get-document', (req, res) => {
+  const docId = req.query.id;
+  // ⚠️ No authorization check
+  const content = fs.readFileSync(`./docs/${docId}.txt`, 'utf8');
+  res.send(content);
+});
+
+// Missing Input Validation
+app.post('/update-age', (req, res) => {
+  const age = req.body.age;
+  // ⚠️ No input validation
+  res.json({ age: age });
+});
+
+// Unsafe Deserialization
+app.post('/load-session', (req, res) => {
+  const sessionData = req.body.session;
+  // ⚠️ Unsafe deserialization
+  const session = JSON.parse(sessionData);
+  res.json(session);
+});
+
+// Server-Side Request Forgery
+app.get('/fetch-url', (req, res) => {
+  const targetUrl = req.query.url;
+  // ⚠️ SSRF vulnerability
+  https.get(targetUrl, (response) => {
+    let data = '';
+    response.on('data', chunk => data += chunk);
+    response.on('end', () => res.send(data));
+  });
+});
+
+// Information Exposure Through Sent Data
+app.get('/user-details', (req, res) => {
+  // ⚠️ Exposing sensitive user information
+  res.json({
+    username: 'admin',
+    password: 'hashed_password',
+    ssn: '123-45-6789',
+    creditCard: '4532-1234-5678-9010'
+  });
+});
+
+// Use of Insufficiently Random Values in Security Context
+app.get('/reset-token', (req, res) => {
+  // ⚠️ Predictable reset token
+  const token = Date.now().toString();
+  res.json({ resetToken: token });
+});
+
+// Cleartext Storage in Cookie
+app.post('/save-session', (req, res) => {
+  const sessionData = JSON.stringify(req.body);
+  // ⚠️ Storing sensitive data in cleartext cookie
+  res.cookie('userData', sessionData, { httpOnly: false });
+  res.json({ saved: true });
+});
+
+// Missing Encryption of Sensitive Data
+app.post('/store-card', (req, res) => {
+  const cardNumber = req.body.cardNumber;
+  // ⚠️ Storing credit card without encryption
+  fs.writeFileSync('cards.txt', cardNumber + '\n', { flag: 'a' });
+  res.json({ stored: true });
+});
+
+// Insufficient Session Expiration
+app.post('/create-session', (req, res) => {
+  const sessionId = crypto.randomBytes(16).toString('hex');
+  // ⚠️ Session never expires
+  res.cookie('sessionId', sessionId);
+  res.json({ sessionId });
+});
+
+// Improper Neutralization of CRLF Sequences
+app.get('/set-header', (req, res) => {
+  const value = req.query.value;
+  // ⚠️ HTTP response splitting
+  res.setHeader('X-Custom-Header', value);
+  res.send('Header set');
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
