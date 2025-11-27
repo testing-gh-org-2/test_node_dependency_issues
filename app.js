@@ -1435,6 +1435,112 @@ const AWS_ACCESS_KEY = 'AKIAIOSFODNN7EXAMPLE';
 const AWS_SECRET_KEY = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
 const PRIVATE_KEY = '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...\n-----END RSA PRIVATE KEY-----';
 
+// CWE-601: URL redirection to untrusted site
+app.get('/goto', (req, res) => {
+  const target = req.query.target;
+  // ⚠️ CWE-601: js/server-side-unvalidated-url-redirection - Open redirect
+  res.redirect(301, target);
+});
+
+// CWE-918: SSRF with socket connection
+app.get('/connect-socket', (req, res) => {
+  const host = req.query.host;
+  const port = parseInt(req.query.port);
+  // ⚠️ CWE-918: js/request-forgery - SSRF through socket
+  const socket = net.createConnection(port, host, () => {
+    socket.write('GET / HTTP/1.1\r\n\r\n');
+  });
+  socket.on('data', (data) => {
+    res.send(data.toString());
+  });
+});
+
+// CWE-525: Information exposure through browser caching
+app.get('/sensitive-data', (req, res) => {
+  // ⚠️ CWE-525: js/information-exposure-through-cache - Missing cache control headers
+  res.json({
+    ssn: '123-45-6789',
+    creditCard: '4111-1111-1111-1111',
+    password: 'secret123'
+  });
+});
+
+// CWE-776: Unrestricted XML entity expansion
+app.post('/xml-entity', (req, res) => {
+  const xml = req.body.xml;
+  // ⚠️ CWE-776: js/xml-bomb - XML entity expansion
+  // Simulated vulnerability - could cause memory exhaustion
+  res.json({ processed: true, length: xml.length });
+});
+
+// CWE-129: Array index from user input
+app.get('/get-item', (req, res) => {
+  const items = ['apple', 'banana', 'cherry'];
+  const index = req.query.index;
+  // ⚠️ CWE-129: js/improper-array-index-validation - Improper validation of array index
+  const item = items[index];
+  res.json({ item });
+});
+
+// CWE-732: Incorrect permission assignment
+app.post('/create-file-perms', (req, res) => {
+  const filename = req.body.filename;
+  const content = req.body.content;
+  // ⚠️ CWE-732: js/incorrect-file-permissions - File created with overly permissive mode
+  fs.writeFileSync(filename, content, { mode: 0o777 });
+  res.json({ created: true });
+});
+
+// CWE-1333: ReDoS with exponential backtracking
+app.get('/validate-complex', (req, res) => {
+  const input = req.query.input;
+  // ⚠️ CWE-1333: js/polynomial-redos - Exponential ReDoS
+  const regex = /^(a|a)*$/;
+  const isValid = regex.test(input);
+  res.json({ isValid });
+});
+
+// CWE-319: Cleartext transmission of sensitive information
+app.post('/send-credentials', (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  // ⚠️ CWE-319: js/clear-text-transmission - Transmitting sensitive data over HTTP
+  const http = require('http');
+  const postData = `username=${username}&password=${password}`;
+  const options = {
+    hostname: 'example.com',
+    port: 80,
+    path: '/api/login',
+    method: 'POST'
+  };
+  const req2 = http.request(options);
+  req2.write(postData);
+  req2.end();
+  res.json({ sent: true });
+});
+
+// CWE-532: Insertion of sensitive information into log file
+app.post('/debug-login', (req, res) => {
+  const user = req.body.username;
+  const pass = req.body.password;
+  const token = req.body.token;
+  // ⚠️ CWE-532: js/clear-text-logging - Sensitive information in log files
+  console.log(`Login attempt - User: ${user}, Password: ${pass}, Token: ${token}`);
+  fs.appendFileSync('debug.log', `User: ${user}, Pass: ${pass}, Token: ${token}\n`);
+  res.json({ logged: true });
+});
+
+// CWE-915: Improperly controlled modification of dynamically-determined object attributes
+app.post('/update-user', (req, res) => {
+  const user = { name: 'John', role: 'user' };
+  const updates = req.body.updates;
+  // ⚠️ CWE-915: js/property-injection - Mass assignment vulnerability
+  for (let key in updates) {
+    user[key] = updates[key];
+  }
+  res.json({ user });
+});
+
 // Server start
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
