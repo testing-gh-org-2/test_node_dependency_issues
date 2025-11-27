@@ -13,7 +13,7 @@ const serialize = require('node-serialize');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ⚠️ Hardcoded credentials vulnerability
+// ⚠️ CWE-798: Hardcoded credentials vulnerability
 const DB_PASSWORD = 'admin123';
 const API_SECRET = 'secret-key-12345';
 
@@ -73,14 +73,14 @@ app.get('/', (req, res) => {
 
 app.get('/user', (req, res) => {
   const userId = req.query.id;
-  // ⚠️ SQL Injection vulnerability - CodeQL should detect this
+  // ⚠️ CWE-89: SQL Injection vulnerability - CodeQL should detect this
   const query = `SELECT * FROM users WHERE id = ${userId}`;
   res.send(`Query would execute: ${query}`);
 });
 
 app.post('/update-config', (req, res) => {
   const config = {};
-  // ⚠️ Prototype Pollution vulnerability - CodeQL should detect this
+  // ⚠️ CWE-1321: Prototype Pollution vulnerability - CodeQL should detect this
   const key = req.body.key;
   const value = req.body.value;
   config[key] = value;
@@ -89,13 +89,13 @@ app.post('/update-config', (req, res) => {
 
 app.get('/search', (req, res) => {
   const searchTerm = req.query.q;
-  // ⚠️ Reflected XSS vulnerability
+  // ⚠️ CWE-79: Reflected XSS vulnerability
   res.send(`<h1>Search Results for: ${searchTerm}</h1>`);
 });
 
 app.get('/ping', (req, res) => {
   const host = req.query.host;
-  // ⚠️ Command Injection vulnerability
+  // ⚠️ CWE-78: Command Injection vulnerability
   exec(`ping ${host}`, (error, stdout, stderr) => {
     if (error) {
       res.send(`Error: ${error.message}`);
@@ -107,7 +107,7 @@ app.get('/ping', (req, res) => {
 
 app.get('/calc', (req, res) => {
   const expression = req.query.expr;
-  // ⚠️ Code Injection vulnerability
+  // ⚠️ CWE-94: Code Injection vulnerability
   try {
     const result = eval(expression);
     res.send(`Result: ${result}`);
@@ -118,7 +118,7 @@ app.get('/calc', (req, res) => {
 
 app.get('/file', (req, res) => {
   const filename = req.query.name;
-  // ⚠️ Path Traversal vulnerability
+  // ⚠️ CWE-22: Path Traversal vulnerability
   const filePath = './uploads/' + filename;
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
@@ -130,14 +130,14 @@ app.get('/file', (req, res) => {
 });
 
 app.get('/token', (req, res) => {
-  // ⚠️ Insecure random number generation
+  // ⚠️ CWE-338: Insecure random number generation
   const token = Math.random().toString(36).substring(7);
   res.json({ sessionToken: token });
 });
 
 app.get('/fetch', (req, res) => {
   const url = req.query.url;
-  // ⚠️ SSRF (Server-Side Request Forgery) vulnerability
+  // ⚠️ CWE-918: SSRF (Server-Side Request Forgery) vulnerability
   https.get(url, (response) => {
     let data = '';
     response.on('data', (chunk) => { data += chunk; });
@@ -149,7 +149,7 @@ app.get('/fetch', (req, res) => {
 
 app.get('/validate', (req, res) => {
   const email = req.query.email;
-  // ⚠️ ReDoS (Regular Expression Denial of Service) vulnerability
+  // ⚠️ CWE-1333: ReDoS (Regular Expression Denial of Service) vulnerability
   const emailRegex = /^([a-zA-Z0-9]+)+@[a-zA-Z0-9]+\.[a-zA-Z]+$/;
   const isValid = emailRegex.test(email);
   res.json({ valid: isValid });
@@ -157,14 +157,14 @@ app.get('/validate', (req, res) => {
 
 app.post('/login', (req, res) => {
   const username = req.body.username;
-  // ⚠️ NoSQL Injection vulnerability
+  // ⚠️ CWE-943: NoSQL Injection vulnerability
   const query = { username: username };
   res.json({ message: 'Would query MongoDB with:', query });
 });
 
 app.post('/ai-prompt', (req, res) => {
   const userInput = req.body.prompt;
-  // ⚠️ Prompt Injection vulnerability - AI/LLM security issue
+  // ⚠️ CWE-94: Prompt Injection vulnerability - AI/LLM security issue
   // Direct user input passed to AI without sanitization
   const systemPrompt = `You are a helpful assistant. User asks: ${userInput}`;
   res.json({ systemPrompt: systemPrompt });
@@ -172,21 +172,21 @@ app.post('/ai-prompt', (req, res) => {
 
 app.post('/update-profile', (req, res) => {
   const user = { id: 1, name: 'John', role: 'user', isAdmin: false };
-  // ⚠️ Mass Assignment vulnerability - allows unauthorized field modification
+  // ⚠️ CWE-915: Mass Assignment vulnerability - allows unauthorized field modification
   Object.assign(user, req.body);
   res.json({ message: 'Profile updated', user: user });
 });
 
 app.get('/verify', (req, res) => {
   const token = req.query.token;
-  // ⚠️ Insecure JWT handling - no signature verification
+  // ⚠️ CWE-347: Insecure JWT handling - no signature verification
   const parts = token.split('.');
   const payload = Buffer.from(parts[1], 'base64').toString();
   res.json({ decoded: JSON.parse(payload) });
 });
 
 app.post('/webhook', (req, res) => {
-  // ⚠️ Missing webhook signature verification
+  // ⚠️ CWE-345: Missing webhook signature verification
   // Accepts data from any source without validation
   const data = req.body;
   console.log('Webhook received:', data);
@@ -195,7 +195,7 @@ app.post('/webhook', (req, res) => {
 
 app.get('/redirect', (req, res) => {
   const target = req.query.url;
-  // ⚠️ Open Redirect vulnerability
+  // ⚠️ CWE-601: Open Redirect vulnerability
   res.redirect(target);
 });
 
@@ -217,7 +217,7 @@ app.post('/api/echo', (req, res) => {
 
 app.get('/encrypt', (req, res) => {
   const data = req.query.data;
-  // ⚠️ Weak cryptographic algorithm - MD5 is insecure
+  // ⚠️ CWE-327: Weak cryptographic algorithm - MD5 is insecure
   const hash = crypto.createHash('md5').update(data).digest('hex');
   res.json({ hash: hash });
 });
@@ -225,14 +225,14 @@ app.get('/encrypt', (req, res) => {
 app.post('/upload', (req, res) => {
   const fileName = req.body.fileName;
   const content = req.body.content;
-  // ⚠️ Arbitrary File Write vulnerability
+  // ⚠️ CWE-73: Arbitrary File Write vulnerability
   fs.writeFileSync(fileName, content);
   res.json({ message: 'File written', file: fileName });
 });
 
 app.get('/exec-code', (req, res) => {
   const code = req.query.code;
-  // ⚠️ VM Escape vulnerability - dangerous use of vm module
+  // ⚠️ CWE-94: VM Escape vulnerability - dangerous use of vm module
   const sandbox = {};
   vm.runInNewContext(code, sandbox);
   res.json({ result: 'Code executed', sandbox: sandbox });
@@ -240,19 +240,19 @@ app.get('/exec-code', (req, res) => {
 
 app.delete('/files', (req, res) => {
   const filePath = req.query.path;
-  // ⚠️ Uncontrolled file deletion
+  // ⚠️ CWE-22: Uncontrolled file deletion
   fs.unlinkSync(filePath);
   res.json({ message: 'File deleted', path: filePath });
 });
 
 app.get('/read-env', (req, res) => {
-  // ⚠️ Information Disclosure - exposing environment variables
+  // ⚠️ CWE-200: Information Disclosure - exposing environment variables
   res.json({ env: process.env });
 });
 
 app.post('/deserialize', (req, res) => {
   const data = req.body.data;
-  // ⚠️ Insecure Deserialization vulnerability
+  // ⚠️ CWE-502: Insecure Deserialization vulnerability
   const obj = JSON.parse(data);
   if (obj.constructor && obj.constructor.name) {
     res.json({ type: obj.constructor.name, data: obj });
@@ -262,27 +262,27 @@ app.post('/deserialize', (req, res) => {
 
 app.get('/template', (req, res) => {
   const template = req.query.tmpl;
-  // ⚠️ Server-Side Template Injection
+  // ⚠️ CWE-94: Server-Side Template Injection
   const rendered = eval('`' + template + '`');
   res.send(rendered);
 });
 
 app.get('/ldap-query', (req, res) => {
   const username = req.query.user;
-  // ⚠️ LDAP Injection vulnerability
+  // ⚠️ CWE-90: LDAP Injection vulnerability
   const ldapQuery = `(&(objectClass=user)(uid=${username}))`;
   res.json({ query: ldapQuery });
 });
 
 app.post('/xml', (req, res) => {
   const xml = req.body.xml;
-  // ⚠️ XML External Entity (XXE) vulnerability
+  // ⚠️ CWE-611: XML External Entity (XXE) vulnerability
   // Parsing XML without disabling external entities
   res.json({ message: 'XML would be parsed', xml: xml });
 });
 
 app.get('/cookie', (req, res) => {
-  // ⚠️ Insecure cookie - missing httpOnly and secure flags
+  // ⚠️ CWE-614: Insecure cookie - missing httpOnly and secure flags
   res.cookie('session', '12345', { httpOnly: false, secure: false });
   res.json({ message: 'Cookie set' });
 });
@@ -290,7 +290,7 @@ app.get('/cookie', (req, res) => {
 app.get('/timing', (req, res) => {
   const password = req.query.password;
   const correctPassword = 'secret123';
-  // ⚠️ Timing Attack vulnerability - string comparison leaks timing info
+  // ⚠️ CWE-208: Timing Attack vulnerability - string comparison leaks timing info
   if (password === correctPassword) {
     res.json({ valid: true });
   } else {
@@ -299,7 +299,7 @@ app.get('/timing', (req, res) => {
 });
 
 app.get('/cors', (req, res) => {
-  // ⚠️ Overly permissive CORS policy
+  // ⚠️ CWE-942: Overly permissive CORS policy
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.json({ data: 'sensitive data' });
@@ -307,21 +307,21 @@ app.get('/cors', (req, res) => {
 
 app.post('/process', (req, res) => {
   const input = req.body.input;
-  // ⚠️ Billion Laughs Attack - XML bomb vulnerability
+  // ⚠️ CWE-776: Billion Laughs Attack - XML bomb vulnerability
   // No input size validation
   res.json({ processed: input });
 });
 
 app.get('/zip', (req, res) => {
   const archivePath = req.query.file;
-  // ⚠️ Zip Slip vulnerability - path traversal in archives
+  // ⚠️ CWE-22: Zip Slip vulnerability - path traversal in archives
   const extractPath = '/tmp/' + archivePath;
   res.json({ extracting: extractPath });
 });
 
 app.get('/buffer', (req, res) => {
   const size = parseInt(req.query.size);
-  // ⚠️ Buffer Overflow - no size validation
+  // ⚠️ CWE-120: Buffer Overflow - no size validation
   const buffer = Buffer.allocUnsafe(size);
   res.json({ bufferSize: buffer.length });
 });
@@ -329,7 +329,7 @@ app.get('/buffer', (req, res) => {
 app.post('/spawn-process', (req, res) => {
   const command = req.body.command;
   const args = req.body.args;
-  // ⚠️ Command Injection via spawn
+  // ⚠️ CWE-78: Command Injection via spawn
   const child = spawn(command, args, { shell: true });
   child.stdout.on('data', (data) => {
     res.write(data);
@@ -339,7 +339,7 @@ app.post('/spawn-process', (req, res) => {
 
 app.get('/dns-lookup', (req, res) => {
   const hostname = req.query.host;
-  // ⚠️ DNS Rebinding vulnerability - no validation
+  // ⚠️ CWE-350: DNS Rebinding vulnerability - no validation
   dns.lookup(hostname, (err, address) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -947,6 +947,439 @@ app.get('/sensitive-file', (req, res) => {
   } else {
     res.json({ message: 'No secrets file found' });
   }
+});
+
+// Additional 50 CodeQL Vulnerabilities
+
+// CWE-117: Improper Output Neutralization for Logs
+app.post('/log-injection', (req, res) => {
+  const userInput = req.body.message;
+  // ⚠️ CWE-117: Log injection vulnerability
+  console.log(`User message: ${userInput}`);
+  res.json({ logged: true });
+});
+
+// CWE-209: Generation of Error Message Containing Sensitive Information
+app.get('/error-details', (req, res) => {
+  try {
+    throw new Error('Database connection failed: password=secret123, host=internal.db.local');
+  } catch (error) {
+    // ⚠️ CWE-209: Exposing sensitive data in error messages
+    res.status(500).send(error.message);
+  }
+});
+
+// CWE-312: Cleartext Storage of Sensitive Information
+app.post('/store-password', (req, res) => {
+  const password = req.body.password;
+  // ⚠️ CWE-312: Storing password in cleartext
+  fs.writeFileSync('passwords.txt', `${req.body.username}:${password}\n`, { flag: 'a' });
+  res.json({ stored: true });
+});
+
+// CWE-326: Inadequate Encryption Strength
+app.post('/weak-encrypt', (req, res) => {
+  const data = req.body.data;
+  // ⚠️ CWE-326: Using DES with weak key
+  const cipher = crypto.createCipheriv('des-ecb', '12345678', null);
+  let encrypted = cipher.update(data, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  res.json({ encrypted });
+});
+
+// CWE-329: Not Using a Random IV with CBC Mode
+app.post('/cbc-no-iv', (req, res) => {
+  const data = req.body.data;
+  // ⚠️ CWE-329: Static IV in CBC mode
+  const iv = Buffer.alloc(16, 0);
+  const cipher = crypto.createCipheriv('aes-128-cbc', '1234567890123456', iv);
+  let encrypted = cipher.update(data, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  res.json({ encrypted });
+});
+
+// CWE-330: Use of Insufficiently Random Values
+app.get('/predictable-token', (req, res) => {
+  // ⚠️ CWE-330: Predictable token generation
+  const token = Date.now().toString() + Math.floor(Math.random() * 1000);
+  res.json({ token });
+});
+
+// CWE-384: Session Fixation
+app.post('/set-session', (req, res) => {
+  const sessionId = req.body.sessionId;
+  // ⚠️ CWE-384: Accepting session ID from user input
+  res.cookie('sessionId', sessionId);
+  res.json({ session: sessionId });
+});
+
+// CWE-425: Direct Request
+app.get('/admin-panel', (req, res) => {
+  // ⚠️ CWE-425: No authentication check for admin page
+  res.send('<h1>Admin Panel</h1><p>Sensitive admin data</p>');
+});
+
+// CWE-476: NULL Pointer Dereference
+app.get('/null-deref', (req, res) => {
+  let user = null;
+  if (req.query.id === '999') {
+    user = { name: 'Admin' };
+  }
+  // ⚠️ CWE-476: Potential null dereference
+  res.json({ name: user.name });
+});
+
+// CWE-523: Unprotected Transport of Credentials
+app.post('/login-http', (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  // ⚠️ CWE-523: Credentials over HTTP without TLS
+  res.json({ message: 'Login processed', username });
+});
+
+// CWE-611: XXE with DTD
+app.post('/parse-dtd', (req, res) => {
+  const xml = req.body.xml;
+  // ⚠️ CWE-611: Processing XML with DTD enabled
+  const parser = require('xml2js');
+  parser.parseString(xml, { dtdValidation: true }, (err, result) => {
+    res.json({ parsed: result });
+  });
+});
+
+// CWE-643: XPath Injection
+app.get('/xpath-query', (req, res) => {
+  const username = req.query.username;
+  // ⚠️ CWE-643: XPath injection vulnerability
+  const xpathQuery = `//users/user[username='${username}']`;
+  res.json({ query: xpathQuery });
+});
+
+// CWE-730: OWASP Top 10 2021 Category A05:2021 - Security Misconfiguration
+app.get('/debug-mode', (req, res) => {
+  // ⚠️ CWE-730: Debug mode enabled in production
+  res.json({
+    debug: true,
+    stack_trace: new Error().stack,
+    env: process.env
+  });
+});
+
+// CWE-759: Use of a One-Way Hash without a Salt
+app.post('/hash-password', (req, res) => {
+  const password = req.body.password;
+  // ⚠️ CWE-759: Hashing password without salt
+  const hash = crypto.createHash('sha256').update(password).digest('hex');
+  res.json({ hash });
+});
+
+// CWE-760: Use of a One-Way Hash with a Predictable Salt
+app.post('/hash-with-salt', (req, res) => {
+  const password = req.body.password;
+  // ⚠️ CWE-760: Predictable salt
+  const salt = 'fixedsalt123';
+  const hash = crypto.createHash('sha256').update(password + salt).digest('hex');
+  res.json({ hash });
+});
+
+// CWE-770: Allocation of Resources Without Limits
+app.post('/unlimited-array', (req, res) => {
+  const items = req.body.items;
+  // ⚠️ CWE-770: No limit on array allocation
+  const arr = new Array(items.length);
+  for (let i = 0; i < items.length; i++) {
+    arr[i] = items[i];
+  }
+  res.json({ processed: arr.length });
+});
+
+// CWE-829: Inclusion from Untrusted Source
+app.get('/load-module', (req, res) => {
+  const modulePath = req.query.module;
+  // ⚠️ CWE-829: Loading module from user input
+  const mod = require(modulePath);
+  res.json({ loaded: modulePath });
+});
+
+// CWE-835: Loop with Unreachable Exit Condition
+app.get('/infinite-loop', (req, res) => {
+  const limit = parseInt(req.query.limit);
+  let count = 0;
+  // ⚠️ CWE-835: Potential infinite loop
+  while (count < limit) {
+    if (limit === 0) {
+      count++; // This will never exit if limit is 0
+    }
+  }
+  res.json({ count });
+});
+
+// CWE-912: Hidden Functionality
+app.get('/secret-backdoor', (req, res) => {
+  // ⚠️ CWE-912: Hidden backdoor functionality
+  if (req.query.secret === 'opensesame') {
+    exec('whoami', (err, stdout) => {
+      res.send(stdout);
+    });
+  } else {
+    res.send('Access denied');
+  }
+});
+
+// CWE-943: NoSQL Injection with $where
+app.post('/nosql-where', (req, res) => {
+  const condition = req.body.condition;
+  // ⚠️ CWE-943: NoSQL injection using $where
+  const query = { $where: condition };
+  res.json({ query });
+});
+
+// CWE-1004: Sensitive Cookie Without HttpOnly Flag
+app.get('/insecure-auth-cookie', (req, res) => {
+  // ⚠️ CWE-1004: Auth token without HttpOnly
+  res.cookie('authToken', 'secret-jwt-token', { httpOnly: false });
+  res.json({ message: 'Cookie set' });
+});
+
+// CWE-1174: ASP.NET Misconfiguration
+app.get('/expose-config', (req, res) => {
+  // ⚠️ CWE-1174: Exposing configuration
+  res.json({
+    apiKey: process.env.API_KEY,
+    dbPassword: process.env.DB_PASSWORD
+  });
+});
+
+// CWE-77: Command Injection in shell
+app.post('/shell-command', (req, res) => {
+  const command = req.body.cmd;
+  // ⚠️ CWE-77: Shell command injection
+  exec(`sh -c "${command}"`, (err, stdout) => {
+    res.send(stdout);
+  });
+});
+
+// CWE-91: XML Injection
+app.post('/xml-generate', (req, res) => {
+  const name = req.body.name;
+  // ⚠️ CWE-91: XML injection
+  const xml = `<user><name>${name}</name></user>`;
+  res.set('Content-Type', 'application/xml');
+  res.send(xml);
+});
+
+// CWE-98: PHP Remote File Inclusion (adapted for Node)
+app.get('/include-remote', (req, res) => {
+  const url = req.query.url;
+  // ⚠️ CWE-98: Including remote file
+  https.get(url, (response) => {
+    let code = '';
+    response.on('data', (chunk) => { code += chunk; });
+    response.on('end', () => {
+      eval(code);
+      res.send('Executed');
+    });
+  });
+});
+
+// CWE-116: Improper Encoding for Output Context
+app.get('/html-encode', (req, res) => {
+  const input = req.query.text;
+  // ⚠️ CWE-116: No encoding for HTML context
+  res.send(`<div>${input}</div>`);
+});
+
+// CWE-134: Uncontrolled Format String
+app.get('/format-string', (req, res) => {
+  const format = req.query.format;
+  // ⚠️ CWE-134: User-controlled format string
+  const result = eval(`\`${format}\``);
+  res.send(result);
+});
+
+// CWE-190: Integer Overflow
+app.get('/integer-overflow', (req, res) => {
+  const a = parseInt(req.query.a);
+  const b = parseInt(req.query.b);
+  // ⚠️ CWE-190: No overflow check
+  const result = a * b;
+  res.json({ result });
+});
+
+// CWE-191: Integer Underflow
+app.get('/integer-underflow', (req, res) => {
+  const a = parseInt(req.query.a);
+  const b = parseInt(req.query.b);
+  // ⚠️ CWE-191: No underflow check
+  const result = a - b;
+  const buffer = Buffer.alloc(result);
+  res.json({ size: result });
+});
+
+// CWE-269: Improper Privilege Management
+app.post('/change-role', (req, res) => {
+  const userId = req.body.userId;
+  const newRole = req.body.role;
+  // ⚠️ CWE-269: No authorization check for role change
+  res.json({ message: `User ${userId} role changed to ${newRole}` });
+});
+
+// CWE-276: Incorrect Default Permissions
+app.post('/create-file', (req, res) => {
+  const filename = req.body.filename;
+  // ⚠️ CWE-276: World-writable file
+  fs.writeFileSync(filename, 'data', { mode: 0o777 });
+  res.json({ created: filename });
+});
+
+// CWE-285: Improper Authorization
+app.delete('/delete-user', (req, res) => {
+  const userId = req.query.userId;
+  // ⚠️ CWE-285: No authorization check
+  res.json({ message: `User ${userId} deleted` });
+});
+
+// CWE-295: Improper Certificate Validation
+app.get('/insecure-request', (req, res) => {
+  const url = req.query.url;
+  // ⚠️ CWE-295: Disabling certificate validation
+  const options = {
+    rejectUnauthorized: false
+  };
+  https.get(url, options, (response) => {
+    res.json({ status: response.statusCode });
+  });
+});
+
+// CWE-319: Cleartext Transmission of Sensitive Information
+app.post('/send-credit-card', (req, res) => {
+  const ccNumber = req.body.ccNumber;
+  // ⚠️ CWE-319: Sending credit card over HTTP
+  res.json({ processed: ccNumber });
+});
+
+// CWE-321: Use of Hard-coded Cryptographic Key
+app.post('/encrypt-data', (req, res) => {
+  const data = req.body.data;
+  // ⚠️ CWE-321: Hard-coded encryption key
+  const key = '1234567890123456';
+  const cipher = crypto.createCipheriv('aes-128-ecb', key, null);
+  let encrypted = cipher.update(data, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  res.json({ encrypted });
+});
+
+// CWE-335: PRNG Seed Error
+app.get('/random-seed', (req, res) => {
+  // ⚠️ CWE-335: Predictable random seed
+  const seed = 12345;
+  const value = (seed * 1103515245 + 12345) & 0x7fffffff;
+  res.json({ random: value });
+});
+
+// CWE-346: Origin Validation Error
+app.post('/cors-anywhere', (req, res) => {
+  // ⚠️ CWE-346: No origin validation
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.json({ data: 'sensitive' });
+});
+
+// CWE-362: Race Condition
+app.post('/race-condition', (req, res) => {
+  const filename = 'balance.txt';
+  // ⚠️ CWE-362: TOCTOU race condition
+  if (fs.existsSync(filename)) {
+    const balance = parseInt(fs.readFileSync(filename, 'utf8'));
+    fs.writeFileSync(filename, (balance - 100).toString());
+    res.json({ newBalance: balance - 100 });
+  }
+});
+
+// CWE-377: Insecure Temporary File
+app.post('/temp-file', (req, res) => {
+  // ⚠️ CWE-377: Predictable temp file name
+  const tempFile = '/tmp/data_' + Date.now() + '.txt';
+  fs.writeFileSync(tempFile, req.body.data);
+  res.json({ file: tempFile });
+});
+
+// CWE-396: Declaration of Catch for Generic Exception
+app.get('/catch-all', (req, res) => {
+  try {
+    eval(req.query.code);
+  } catch (e) {
+    // ⚠️ CWE-396: Catching all exceptions without proper handling
+    res.send('Error occurred');
+  }
+});
+
+// CWE-426: Untrusted Search Path
+app.get('/load-library', (req, res) => {
+  const libName = req.query.lib;
+  // ⚠️ CWE-426: Loading from untrusted path
+  const lib = require('./' + libName);
+  res.json({ loaded: libName });
+});
+
+// CWE-441: Unintended Proxy or Intermediary
+app.get('/proxy-request', (req, res) => {
+  const target = req.query.target;
+  // ⚠️ CWE-441: Open proxy
+  https.get(target, (response) => {
+    response.pipe(res);
+  });
+});
+
+// CWE-494: Download of Code Without Integrity Check
+app.post('/install-package', (req, res) => {
+  const packageUrl = req.body.url;
+  // ⚠️ CWE-494: No integrity check
+  exec(`npm install ${packageUrl}`, (err, stdout) => {
+    res.send(stdout);
+  });
+});
+
+// CWE-521: Weak Password Requirements
+app.post('/signup', (req, res) => {
+  const password = req.body.password;
+  // ⚠️ CWE-521: No password strength validation
+  res.json({ message: 'Account created', password });
+});
+
+// CWE-522: Insufficiently Protected Credentials
+app.get('/get-credentials', (req, res) => {
+  // ⚠️ CWE-522: Credentials in response
+  res.json({
+    username: 'admin',
+    password: 'admin123',
+    apiKey: 'sk-1234567890'
+  });
+});
+
+// CWE-552: Files or Directories Accessible to External Parties
+app.get('/read-any-file', (req, res) => {
+  const file = req.query.file;
+  // ⚠️ CWE-552: Reading arbitrary files
+  const content = fs.readFileSync(file, 'utf8');
+  res.send(content);
+});
+
+// CWE-565: Reliance on Cookies without Validation
+app.get('/admin-check', (req, res) => {
+  // ⚠️ CWE-565: Trusting cookie without validation
+  if (req.cookies.isAdmin === 'true') {
+    res.send('Admin access granted');
+  } else {
+    res.send('Access denied');
+  }
+});
+
+// CWE-598: Information Exposure Through Query Strings
+app.get('/reset-password', (req, res) => {
+  const token = req.query.token;
+  const password = req.query.newPassword;
+  // ⚠️ CWE-598: Sensitive data in query string
+  res.json({ message: 'Password reset', token, password });
 });
 
 // Error handling middleware
