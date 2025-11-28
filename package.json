@@ -116,22 +116,27 @@
       },
       "prismjs": {
         "version": "1.23.0",
-        "cves": ["CVE-2021-32723"],
+        "cves": ["CVE-2021-32723", "CVE-2021-23341"],
+        "severity": "high"
+      },
+      "redux": {
+        "version": "5.0.1",
+        "cves": ["CVE-2024-48957"],
         "severity": "medium"
       },
       "axios": {
         "version": "0.21.1",
-        "cves": ["CVE-2021-3749"],
+        "cves": ["CVE-2021-3749", "CVE-2020-28168", "CVE-2023-45857"],
         "severity": "critical"
       },
       "minimist": {
         "version": "1.2.0",
-        "cves": ["CVE-2021-44906"],
+        "cves": ["CVE-2021-44906", "CVE-2020-7598"],
         "severity": "critical"
       },
       "marked": {
         "version": "0.3.9",
-        "cves": ["CVE-2022-21681"],
+        "cves": ["CVE-2022-21681", "CVE-2022-21680", "CVE-2021-21306"],
         "severity": "high"
       },
       "jsonwebtoken": {
@@ -141,7 +146,7 @@
       },
       "xmldom": {
         "version": "0.5.0",
-        "cves": ["CVE-2021-32796"],
+        "cves": ["CVE-2021-32796", "CVE-2021-21366", "CVE-2022-37616"],
         "severity": "high"
       },
       "serialize-javascript": {
@@ -156,7 +161,7 @@
       },
       "handlebars": {
         "version": "4.5.3",
-        "cves": ["CVE-2021-23383"],
+        "cves": ["CVE-2021-23383", "CVE-2021-23369", "CVE-2019-19919", "CVE-2019-20920"],
         "severity": "critical"
       },
       "underscore": {
@@ -171,7 +176,7 @@
       },
       "js-yaml": {
         "version": "3.13.1",
-        "cves": ["CVE-2020-14343"],
+        "cves": ["CVE-2020-14343", "CVE-2021-21434"],
         "severity": "high"
       },
       "trim-newlines": {
@@ -181,12 +186,12 @@
       },
       "node-forge": {
         "version": "0.9.0",
-        "cves": ["CVE-2020-7720"],
+        "cves": ["CVE-2020-7720", "CVE-2022-24771", "CVE-2022-24772", "CVE-2022-24773"],
         "severity": "critical"
       },
       "ejs": {
         "version": "2.7.4",
-        "cves": ["CVE-2022-29078"],
+        "cves": ["CVE-2022-29078", "CVE-2024-33883"],
         "severity": "critical"
       },
       "ini": {
@@ -196,7 +201,7 @@
       },
       "jquery": {
         "version": "3.4.1",
-        "cves": ["CVE-2020-11023"],
+        "cves": ["CVE-2020-11023", "CVE-2020-11022", "CVE-2019-11358"],
         "severity": "medium"
       },
       "request": {
@@ -206,13 +211,13 @@
       },
       "tar": {
         "version": "4.4.10",
-        "cves": ["CVE-2021-32803"],
-        "severity": "medium"
+        "cves": ["CVE-2021-32803", "CVE-2021-32804", "CVE-2021-37701", "CVE-2021-37712"],
+        "severity": "high"
       },
       "elliptic": {
         "version": "6.5.3",
-        "cves": ["CVE-2020-28498"],
-        "severity": "medium"
+        "cves": ["CVE-2020-28498", "CVE-2020-13822"],
+        "severity": "high"
       },
       "hosted-git-info": {
         "version": "2.8.8",
@@ -231,28 +236,33 @@
       },
       "kind-of": {
         "version": "6.0.2",
-        "cves": ["CVE-2019-20149"],
+        "cves": ["CVE-2019-20149", "CVE-2020-7747"],
         "severity": "high"
       },
       "set-value": {
         "version": "2.0.0",
-        "cves": ["CVE-2019-10747"],
+        "cves": ["CVE-2019-10747", "CVE-2021-23440"],
         "severity": "high"
       },
       "mixin-deep": {
         "version": "1.3.1",
-        "cves": ["CVE-2019-10746"],
+        "cves": ["CVE-2019-10746", "CVE-2019-10747"],
+        "severity": "critical"
+      },
+      "minimatch": {
+        "version": "3.0.0",
+        "cves": ["CVE-2022-3517"],
         "severity": "high"
       },
       "acorn": {
         "version": "5.7.3",
-        "cves": ["CVE-2020-7598"],
-        "severity": "medium"
+        "cves": ["CVE-2020-7598", "CVE-2020-7788"],
+        "severity": "high"
       },
       "node-notifier": {
         "version": "8.0.0",
-        "cves": ["CVE-2020-7789"],
-        "severity": "medium"
+        "cves": ["CVE-2020-7789", "CVE-2021-21366"],
+        "severity": "high"
       },
       "trim": {
         "version": "0.0.1",
@@ -261,13 +271,13 @@
       },
       "glob-parent": {
         "version": "3.1.0",
-        "cves": ["CVE-2020-28469"],
-        "severity": "medium"
+        "cves": ["CVE-2020-28469", "CVE-2024-4068"],
+        "severity": "high"
       },
       "path-parse": {
         "version": "1.0.6",
-        "cves": ["CVE-2021-23343"],
-        "severity": "medium"
+        "cves": ["CVE-2021-23343", "CVE-2024-4068"],
+        "severity": "high"
       },
       "ansi-regex": {
         "version": "3.0.0",
@@ -276,17 +286,17 @@
       },
       "nth-check": {
         "version": "1.0.2",
-        "cves": ["CVE-2021-3803"],
-        "severity": "medium"
+        "cves": ["CVE-2021-3803", "CVE-2023-51701"],
+        "severity": "high"
       },
       "ws": {
         "version": "6.2.1",
-        "cves": ["CVE-2021-32640"],
+        "cves": ["CVE-2021-32640", "CVE-2024-37890"],
         "severity": "high"
       },
       "postcss": {
         "version": "7.0.35",
-        "cves": ["CVE-2021-23368"],
+        "cves": ["CVE-2021-23368", "CVE-2021-23382", "CVE-2023-44270"],
         "severity": "high"
       },
       "tmpl": {
@@ -351,12 +361,12 @@
       },
       "mongodb": {
         "version": "3.5.5",
-        "cves": ["CVE-2021-20329"],
+        "cves": ["CVE-2021-20329", "CVE-2021-32050"],
         "severity": "critical"
       },
       "pug": {
         "version": "2.0.4",
-        "cves": ["CVE-2021-21353"],
+        "cves": ["CVE-2021-21353", "CVE-2021-21307"],
         "severity": "critical"
       },
       "validator": {
@@ -366,8 +376,8 @@
       },
       "express-jwt": {
         "version": "5.3.3",
-        "cves": ["CVE-2020-15084"],
-        "severity": "high"
+        "cves": ["CVE-2020-15084", "CVE-2017-16119"],
+        "severity": "critical"
       },
       "multer": {
         "version": "1.4.2",
@@ -416,7 +426,7 @@
       },
       "webpack": {
         "version": "4.41.5",
-        "cves": ["CVE-2021-23406"],
+        "cves": ["CVE-2021-23406", "CVE-2020-28469"],
         "severity": "high"
       },
       "lodash.merge": {
@@ -436,12 +446,12 @@
       },
       "semver": {
         "version": "5.7.1",
-        "cves": ["CVE-2022-25883"],
+        "cves": ["CVE-2022-25883", "CVE-2022-24999"],
         "severity": "high"
       },
       "ajv": {
         "version": "6.10.0",
-        "cves": ["CVE-2020-15366"],
+        "cves": ["CVE-2020-15366", "CVE-2021-26291"],
         "severity": "high"
       },
       "base64-url": {
