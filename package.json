@@ -10,86 +10,90 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "lodash": "^4.17.19",
-    "node-fetch": "^1.7.3",
-    "prismjs": "^1.23.0",
-    "redux": "^5.0.1",
-    "axios": "^0.21.1",
-    "minimist": "^1.2.0",
-    "marked": "^0.3.9",
-    "jsonwebtoken": "^8.5.1",
-    "xmldom": "^0.5.0",
-    "serialize-javascript": "^3.0.0",
-    "dot-prop": "^4.2.0",
-    "handlebars": "^4.5.3",
-    "underscore": "^1.12.0",
-    "yargs-parser": "^13.1.1",
-    "js-yaml": "^3.13.1",
-    "trim-newlines": "^3.0.0",
-    "node-forge": "^0.9.0",
-    "ejs": "^2.7.4",
-    "ini": "^1.3.5",
-    "jquery": "^3.4.1",
-    "moment": "^2.29.1",
-    "request": "^2.88.0",
-    "tar": "^4.4.10",
-    "elliptic": "^6.5.3",
-    "hosted-git-info": "^2.8.8",
-    "socket.io": "^2.3.0",
-    "bl": "^1.2.2",
-    "kind-of": "^6.0.2",
-    "set-value": "^2.0.0",
-    "mixin-deep": "^1.3.1",
-    "minimatch": "^3.0.0",
     "acorn": "^5.7.3",
-    "node-notifier": "^8.0.0",
-    "trim": "^0.0.1",
-    "glob-parent": "^3.1.0",
-    "path-parse": "^1.0.6",
-    "ansi-regex": "^3.0.0",
-    "nth-check": "^1.0.2",
-    "ws": "^6.2.1",
-    "postcss": "^7.0.35",
-    "tmpl": "^1.0.4",
-    "xml2js": "^0.4.19",
-    "cookie": "^0.4.0",
-    "passport": "^0.4.1",
-    "express-fileupload": "^1.1.7",
-    "morgan": "^1.10.0",
-    "debug": "^2.6.9",
-    "uuid": "^3.3.2",
-    "node-serialize": "^0.0.4",
-    "shelljs": "^0.8.3",
-    "npm": "^6.14.4",
-    "body-parser": "^1.19.0",
-    "mongodb": "^3.5.5",
-    "pug": "^2.0.4",
-    "validator": "^10.11.0",
-    "express-jwt": "^5.3.3",
-    "multer": "^1.4.2",
-    "sequelize": "^5.21.5",
-    "bcrypt": "^5.1.1",
-    "express-session": "^1.16.2",
-    "querystring": "^0.2.0",
-    "cookie-parser": "^1.4.4",
-    "cors": "^2.8.5",
-    "helmet": "^3.21.2",
-    "sass": "^1.69.5",
-    "webpack": "^4.41.5",
-    "lodash.merge": "^4.6.1",
-    "lodash.template": "^4.4.0",
-    "bootstrap": "^4.3.1",
-    "semver": "^5.7.1",
     "ajv": "^6.10.0",
+    "ansi-regex": "^3.0.0",
+    "axios": "^0.21.1",
     "base64-url": "^2.2.0",
+    "bcrypt": "^5.1.1",
+    "bl": "^1.2.2",
+    "body-parser": "^1.18.2",
+    "bootstrap": "^4.3.1",
     "chownr": "^1.1.3",
     "colors": "^1.3.3",
-    "fstream": "^1.0.12",
-    "growl": "^1.10.5",
-    "json-schema": "^0.2.3",
+    "commander": "^2.20.0",
+    "cookie": "^0.4.0",
+    "cookie-parser": "^1.4.4",
+    "cors": "^2.8.5",
+    "debug": "^2.6.8",
+    "dot-prop": "^4.2.0",
+    "ejs": "^2.5.7",
+    "elliptic": "^6.5.3",
+    "express": "^4.16.0",
+    "express-fileupload": "^1.1.7",
+    "express-jwt": "^5.3.3",
+    "express-session": "^1.16.2",
     "forwarded": "^0.1.2",
-    "static-eval": "^2.0.0"
+    "fresh": "^0.5.0",
+    "fstream": "^1.0.12",
+    "glob-parent": "^3.1.0",
+    "growl": "^1.10.5",
+    "handlebars": "^4.5.3",
+    "helmet": "^3.21.2",
+    "hosted-git-info": "^2.8.8",
+    "ini": "^1.3.5",
+    "jquery": "^3.4.1",
+    "js-yaml": "^3.13.1",
+    "json-schema": "^0.2.3",
+    "jsonwebtoken": "^8.5.1",
+    "kind-of": "^6.0.2",
+    "lodash": "^4.17.4",
+    "lodash.merge": "^4.6.1",
+    "lodash.template": "^4.4.0",
+    "marked": "^0.3.9",
+    "minimatch": "^3.0.0",
+    "minimist": "^1.2.0",
+    "mixin-deep": "^1.3.1",
+    "moment": "^2.22.0",
+    "mongodb": "^3.5.5",
+    "morgan": "^1.10.0",
+    "ms": "^2.0.0",
+    "multer": "^1.4.2",
+    "node-fetch": "^1.7.3",
+    "node-forge": "^0.9.0",
+    "node-notifier": "^8.0.0",
+    "node-serialize": "^0.0.4",
+    "npm": "^6.14.4",
+    "nth-check": "^1.0.2",
+    "passport": "^0.4.1",
+    "path-parse": "^1.0.6",
+    "postcss": "^7.0.35",
+    "prismjs": "^1.23.0",
+    "pug": "^2.0.4",
+    "qs": "^6.5.1",
+    "querystring": "^0.2.0",
+    "redux": "^5.0.1",
+    "request": "^2.88.0",
+    "sass": "^1.69.5",
+    "semver": "^5.7.1",
+    "sequelize": "^5.21.5",
+    "serialize-javascript": "^3.0.0",
+    "set-value": "^2.0.0",
+    "shelljs": "^0.8.3",
+    "socket.io": "^2.3.0",
+    "static-eval": "^2.0.0",
+    "tar": "^4.4.10",
+    "tmpl": "^1.0.4",
+    "trim": "^0.0.1",
+    "trim-newlines": "^3.0.0",
+    "underscore": "^1.12.0",
+    "uuid": "^3.3.2",
+    "validator": "^10.11.0",
+    "webpack": "^4.41.5",
+    "ws": "^6.2.1",
+    "xml2js": "^0.4.19",
+    "xmldom": "^0.5.0",
+    "yargs-parser": "^13.1.1"
   },
   "vulnerabilities": {
     "summary": {
@@ -101,397 +105,594 @@
     "packages": {
       "express": {
         "version": "4.17.1",
-        "cves": ["CVE-2022-24999"],
+        "cves": [
+          "CVE-2022-24999"
+        ],
         "severity": "medium"
       },
       "lodash": {
         "version": "4.17.19",
-        "cves": ["CVE-2020-8203"],
+        "cves": [
+          "CVE-2020-8203"
+        ],
         "severity": "critical"
       },
       "node-fetch": {
         "version": "1.7.3",
-        "cves": ["CVE-2020-15168"],
+        "cves": [
+          "CVE-2020-15168"
+        ],
         "severity": "medium"
       },
       "prismjs": {
         "version": "1.23.0",
-        "cves": ["CVE-2021-32723", "CVE-2021-23341"],
+        "cves": [
+          "CVE-2021-32723",
+          "CVE-2021-23341"
+        ],
         "severity": "high"
       },
       "redux": {
         "version": "5.0.1",
-        "cves": ["CVE-2024-48957"],
+        "cves": [
+          "CVE-2024-48957"
+        ],
         "severity": "medium"
       },
       "axios": {
         "version": "0.21.1",
-        "cves": ["CVE-2021-3749", "CVE-2020-28168", "CVE-2023-45857"],
+        "cves": [
+          "CVE-2021-3749",
+          "CVE-2020-28168",
+          "CVE-2023-45857"
+        ],
         "severity": "critical"
       },
       "minimist": {
         "version": "1.2.0",
-        "cves": ["CVE-2021-44906", "CVE-2020-7598"],
+        "cves": [
+          "CVE-2021-44906",
+          "CVE-2020-7598"
+        ],
         "severity": "critical"
       },
       "marked": {
         "version": "0.3.9",
-        "cves": ["CVE-2022-21681", "CVE-2022-21680", "CVE-2021-21306"],
+        "cves": [
+          "CVE-2022-21681",
+          "CVE-2022-21680",
+          "CVE-2021-21306"
+        ],
         "severity": "high"
       },
       "jsonwebtoken": {
         "version": "8.5.1",
-        "cves": ["CVE-2022-23529"],
+        "cves": [
+          "CVE-2022-23529"
+        ],
         "severity": "critical"
       },
       "xmldom": {
         "version": "0.5.0",
-        "cves": ["CVE-2021-32796", "CVE-2021-21366", "CVE-2022-37616"],
+        "cves": [
+          "CVE-2021-32796",
+          "CVE-2021-21366",
+          "CVE-2022-37616"
+        ],
         "severity": "high"
       },
       "serialize-javascript": {
         "version": "3.0.0",
-        "cves": ["CVE-2020-7660"],
+        "cves": [
+          "CVE-2020-7660"
+        ],
         "severity": "high"
       },
       "dot-prop": {
         "version": "4.2.0",
-        "cves": ["CVE-2020-8116"],
+        "cves": [
+          "CVE-2020-8116"
+        ],
         "severity": "high"
       },
       "handlebars": {
         "version": "4.5.3",
-        "cves": ["CVE-2021-23383", "CVE-2021-23369", "CVE-2019-19919", "CVE-2019-20920"],
+        "cves": [
+          "CVE-2021-23383",
+          "CVE-2021-23369",
+          "CVE-2019-19919",
+          "CVE-2019-20920"
+        ],
         "severity": "critical"
       },
       "underscore": {
         "version": "1.12.0",
-        "cves": ["CVE-2021-23358"],
+        "cves": [
+          "CVE-2021-23358"
+        ],
         "severity": "medium"
       },
       "yargs-parser": {
         "version": "13.1.1",
-        "cves": ["CVE-2020-7608"],
+        "cves": [
+          "CVE-2020-7608"
+        ],
         "severity": "high"
       },
       "js-yaml": {
         "version": "3.13.1",
-        "cves": ["CVE-2020-14343", "CVE-2021-21434"],
+        "cves": [
+          "CVE-2020-14343",
+          "CVE-2021-21434"
+        ],
         "severity": "high"
       },
       "trim-newlines": {
         "version": "3.0.0",
-        "cves": ["CVE-2021-33623"],
+        "cves": [
+          "CVE-2021-33623"
+        ],
         "severity": "medium"
       },
       "node-forge": {
         "version": "0.9.0",
-        "cves": ["CVE-2020-7720", "CVE-2022-24771", "CVE-2022-24772", "CVE-2022-24773"],
+        "cves": [
+          "CVE-2020-7720",
+          "CVE-2022-24771",
+          "CVE-2022-24772",
+          "CVE-2022-24773"
+        ],
         "severity": "critical"
       },
       "ejs": {
         "version": "2.7.4",
-        "cves": ["CVE-2022-29078", "CVE-2024-33883"],
+        "cves": [
+          "CVE-2022-29078",
+          "CVE-2024-33883"
+        ],
         "severity": "critical"
       },
       "ini": {
         "version": "1.3.5",
-        "cves": ["CVE-2020-7788"],
+        "cves": [
+          "CVE-2020-7788"
+        ],
         "severity": "high"
       },
       "jquery": {
         "version": "3.4.1",
-        "cves": ["CVE-2020-11023", "CVE-2020-11022", "CVE-2019-11358"],
+        "cves": [
+          "CVE-2020-11023",
+          "CVE-2020-11022",
+          "CVE-2019-11358"
+        ],
         "severity": "medium"
       },
       "request": {
         "version": "2.88.0",
-        "cves": ["CVE-2023-28155"],
+        "cves": [
+          "CVE-2023-28155"
+        ],
         "severity": "medium"
       },
       "tar": {
         "version": "4.4.10",
-        "cves": ["CVE-2021-32803", "CVE-2021-32804", "CVE-2021-37701", "CVE-2021-37712"],
+        "cves": [
+          "CVE-2021-32803",
+          "CVE-2021-32804",
+          "CVE-2021-37701",
+          "CVE-2021-37712"
+        ],
         "severity": "high"
       },
       "elliptic": {
         "version": "6.5.3",
-        "cves": ["CVE-2020-28498", "CVE-2020-13822"],
+        "cves": [
+          "CVE-2020-28498",
+          "CVE-2020-13822"
+        ],
         "severity": "high"
       },
       "hosted-git-info": {
         "version": "2.8.8",
-        "cves": ["CVE-2021-23362"],
+        "cves": [
+          "CVE-2021-23362"
+        ],
         "severity": "medium"
       },
       "socket.io": {
         "version": "2.3.0",
-        "cves": ["CVE-2020-28481"],
+        "cves": [
+          "CVE-2020-28481"
+        ],
         "severity": "high"
       },
       "bl": {
         "version": "1.2.2",
-        "cves": ["CVE-2020-8244"],
+        "cves": [
+          "CVE-2020-8244"
+        ],
         "severity": "high"
       },
       "kind-of": {
         "version": "6.0.2",
-        "cves": ["CVE-2019-20149", "CVE-2020-7747"],
+        "cves": [
+          "CVE-2019-20149",
+          "CVE-2020-7747"
+        ],
         "severity": "high"
       },
       "set-value": {
         "version": "2.0.0",
-        "cves": ["CVE-2019-10747", "CVE-2021-23440"],
+        "cves": [
+          "CVE-2019-10747",
+          "CVE-2021-23440"
+        ],
         "severity": "high"
       },
       "mixin-deep": {
         "version": "1.3.1",
-        "cves": ["CVE-2019-10746", "CVE-2019-10747"],
+        "cves": [
+          "CVE-2019-10746",
+          "CVE-2019-10747"
+        ],
         "severity": "critical"
       },
       "minimatch": {
         "version": "3.0.0",
-        "cves": ["CVE-2022-3517"],
+        "cves": [
+          "CVE-2022-3517"
+        ],
         "severity": "high"
       },
       "acorn": {
         "version": "5.7.3",
-        "cves": ["CVE-2020-7598", "CVE-2020-7788"],
+        "cves": [
+          "CVE-2020-7598",
+          "CVE-2020-7788"
+        ],
         "severity": "high"
       },
       "node-notifier": {
         "version": "8.0.0",
-        "cves": ["CVE-2020-7789", "CVE-2021-21366"],
+        "cves": [
+          "CVE-2020-7789",
+          "CVE-2021-21366"
+        ],
         "severity": "high"
       },
       "trim": {
         "version": "0.0.1",
-        "cves": ["CVE-2020-7753"],
+        "cves": [
+          "CVE-2020-7753"
+        ],
         "severity": "medium"
       },
       "glob-parent": {
         "version": "3.1.0",
-        "cves": ["CVE-2020-28469", "CVE-2024-4068"],
+        "cves": [
+          "CVE-2020-28469",
+          "CVE-2024-4068"
+        ],
         "severity": "high"
       },
       "path-parse": {
         "version": "1.0.6",
-        "cves": ["CVE-2021-23343", "CVE-2024-4068"],
+        "cves": [
+          "CVE-2021-23343",
+          "CVE-2024-4068"
+        ],
         "severity": "high"
       },
       "ansi-regex": {
         "version": "3.0.0",
-        "cves": ["CVE-2021-3807"],
+        "cves": [
+          "CVE-2021-3807"
+        ],
         "severity": "medium"
       },
       "nth-check": {
         "version": "1.0.2",
-        "cves": ["CVE-2021-3803", "CVE-2023-51701"],
+        "cves": [
+          "CVE-2021-3803",
+          "CVE-2023-51701"
+        ],
         "severity": "high"
       },
       "ws": {
         "version": "6.2.1",
-        "cves": ["CVE-2021-32640", "CVE-2024-37890"],
+        "cves": [
+          "CVE-2021-32640",
+          "CVE-2024-37890"
+        ],
         "severity": "high"
       },
       "postcss": {
         "version": "7.0.35",
-        "cves": ["CVE-2021-23368", "CVE-2021-23382", "CVE-2023-44270"],
+        "cves": [
+          "CVE-2021-23368",
+          "CVE-2021-23382",
+          "CVE-2023-44270"
+        ],
         "severity": "high"
       },
       "tmpl": {
         "version": "1.0.4",
-        "cves": ["CVE-2021-33623"],
+        "cves": [
+          "CVE-2021-33623"
+        ],
         "severity": "medium"
       },
       "xml2js": {
         "version": "0.4.19",
-        "cves": ["CVE-2023-0842"],
+        "cves": [
+          "CVE-2023-0842"
+        ],
         "severity": "high"
       },
       "cookie": {
         "version": "0.4.0",
-        "cves": ["CVE-2020-7792"],
+        "cves": [
+          "CVE-2020-7792"
+        ],
         "severity": "medium"
       },
       "passport": {
         "version": "0.4.1",
-        "cves": ["CVE-2022-25896"],
+        "cves": [
+          "CVE-2022-25896"
+        ],
         "severity": "medium"
       },
       "express-fileupload": {
         "version": "1.1.7",
-        "cves": ["CVE-2020-7699"],
+        "cves": [
+          "CVE-2020-7699"
+        ],
         "severity": "high"
       },
       "morgan": {
         "version": "1.10.0",
-        "cves": ["CVE-2019-5413"],
+        "cves": [
+          "CVE-2019-5413"
+        ],
         "severity": "medium"
       },
       "debug": {
         "version": "2.6.9",
-        "cves": ["CVE-2017-16137"],
+        "cves": [
+          "CVE-2017-16137"
+        ],
         "severity": "medium"
       },
       "uuid": {
         "version": "3.3.2",
-        "cves": ["CVE-2021-3803"],
+        "cves": [
+          "CVE-2021-3803"
+        ],
         "severity": "medium"
       },
       "node-serialize": {
         "version": "0.0.4",
-        "cves": ["CVE-2017-5941"],
+        "cves": [
+          "CVE-2017-5941"
+        ],
         "severity": "critical"
       },
       "shelljs": {
         "version": "0.8.3",
-        "cves": ["CVE-2020-7682"],
+        "cves": [
+          "CVE-2020-7682"
+        ],
         "severity": "critical"
       },
       "npm": {
         "version": "6.14.4",
-        "cves": ["CVE-2021-39134"],
+        "cves": [
+          "CVE-2021-39134"
+        ],
         "severity": "medium"
       },
       "body-parser": {
         "version": "1.19.0",
-        "cves": ["CVE-2022-29167"],
+        "cves": [
+          "CVE-2022-29167"
+        ],
         "severity": "medium"
       },
       "mongodb": {
         "version": "3.5.5",
-        "cves": ["CVE-2021-20329", "CVE-2021-32050"],
+        "cves": [
+          "CVE-2021-20329",
+          "CVE-2021-32050"
+        ],
         "severity": "critical"
       },
       "pug": {
         "version": "2.0.4",
-        "cves": ["CVE-2021-21353", "CVE-2021-21307"],
+        "cves": [
+          "CVE-2021-21353",
+          "CVE-2021-21307"
+        ],
         "severity": "critical"
       },
       "validator": {
         "version": "10.11.0",
-        "cves": ["CVE-2021-3765"],
+        "cves": [
+          "CVE-2021-3765"
+        ],
         "severity": "high"
       },
       "express-jwt": {
         "version": "5.3.3",
-        "cves": ["CVE-2020-15084", "CVE-2017-16119"],
+        "cves": [
+          "CVE-2020-15084",
+          "CVE-2017-16119"
+        ],
         "severity": "critical"
       },
       "multer": {
         "version": "1.4.2",
-        "cves": ["CVE-2022-24434"],
+        "cves": [
+          "CVE-2022-24434"
+        ],
         "severity": "high"
       },
       "sequelize": {
         "version": "5.21.5",
-        "cves": ["CVE-2023-22578"],
+        "cves": [
+          "CVE-2023-22578"
+        ],
         "severity": "critical"
       },
       "bcrypt": {
         "version": "3.0.8",
-        "cves": ["CVE-2020-7689"],
+        "cves": [
+          "CVE-2020-7689"
+        ],
         "severity": "high"
       },
       "express-session": {
         "version": "1.16.2",
-        "cves": ["CVE-2020-7729"],
+        "cves": [
+          "CVE-2020-7729"
+        ],
         "severity": "medium"
       },
       "querystring": {
         "version": "0.2.0",
-        "cves": ["CVE-2021-3749"],
+        "cves": [
+          "CVE-2021-3749"
+        ],
         "severity": "medium"
       },
       "cookie-parser": {
         "version": "1.4.4",
-        "cves": ["CVE-2019-5481"],
+        "cves": [
+          "CVE-2019-5481"
+        ],
         "severity": "medium"
       },
       "cors": {
         "version": "2.8.5",
-        "cves": ["CVE-2023-45857"],
+        "cves": [
+          "CVE-2023-45857"
+        ],
         "severity": "medium"
       },
       "helmet": {
         "version": "3.21.2",
-        "cves": ["CVE-2020-7736"],
+        "cves": [
+          "CVE-2020-7736"
+        ],
         "severity": "medium"
       },
       "node-sass": {
         "version": "4.13.1",
-        "cves": ["CVE-2020-24025"],
+        "cves": [
+          "CVE-2020-24025"
+        ],
         "severity": "critical"
       },
       "webpack": {
         "version": "4.41.5",
-        "cves": ["CVE-2021-23406", "CVE-2020-28469"],
+        "cves": [
+          "CVE-2021-23406",
+          "CVE-2020-28469"
+        ],
         "severity": "high"
       },
       "lodash.merge": {
         "version": "4.6.1",
-        "cves": ["CVE-2020-8203"],
+        "cves": [
+          "CVE-2020-8203"
+        ],
         "severity": "high"
       },
       "lodash.template": {
         "version": "4.4.0",
-        "cves": ["CVE-2019-10744"],
+        "cves": [
+          "CVE-2019-10744"
+        ],
         "severity": "high"
       },
       "bootstrap": {
         "version": "4.3.1",
-        "cves": ["CVE-2019-8331"],
+        "cves": [
+          "CVE-2019-8331"
+        ],
         "severity": "medium"
       },
       "semver": {
         "version": "5.7.1",
-        "cves": ["CVE-2022-25883", "CVE-2022-24999"],
+        "cves": [
+          "CVE-2022-25883",
+          "CVE-2022-24999"
+        ],
         "severity": "high"
       },
       "ajv": {
         "version": "6.10.0",
-        "cves": ["CVE-2020-15366", "CVE-2021-26291"],
+        "cves": [
+          "CVE-2020-15366",
+          "CVE-2021-26291"
+        ],
         "severity": "high"
       },
       "base64-url": {
         "version": "2.2.0",
-        "cves": ["CVE-2019-10744"],
+        "cves": [
+          "CVE-2019-10744"
+        ],
         "severity": "medium"
       },
       "chownr": {
         "version": "1.1.3",
-        "cves": ["CVE-2021-32803"],
+        "cves": [
+          "CVE-2021-32803"
+        ],
         "severity": "medium"
       },
       "colors": {
         "version": "1.3.3",
-        "cves": ["CVE-2021-23567"],
+        "cves": [
+          "CVE-2021-23567"
+        ],
         "severity": "high"
       },
       "fstream": {
         "version": "1.0.12",
-        "cves": ["CVE-2019-13173"],
+        "cves": [
+          "CVE-2019-13173"
+        ],
         "severity": "high"
       },
       "growl": {
         "version": "1.10.5",
-        "cves": ["CVE-2017-16042"],
+        "cves": [
+          "CVE-2017-16042"
+        ],
         "severity": "high"
       },
       "json-schema": {
         "version": "0.2.3",
-        "cves": ["CVE-2021-3918"],
+        "cves": [
+          "CVE-2021-3918"
+        ],
         "severity": "medium"
       },
       "forwarded": {
         "version": "0.1.2",
-        "cves": ["CVE-2017-16014"],
+        "cves": [
+          "CVE-2017-16014"
+        ],
         "severity": "medium"
       },
       "static-eval": {
         "version": "2.0.0",
-        "cves": ["CVE-2017-16226"],
+        "cves": [
+          "CVE-2017-16226"
+        ],
         "severity": "high"
       }
     }
