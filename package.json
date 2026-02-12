@@ -1,13 +1,36 @@
 {
-  "name": "frontend-project",
+  "name": "security-test-project",
   "version": "1.0.0",
-  "description": "Test project with intentional vulnerabilities for security scanning validation",
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
+  "description": "Test project with known vulnerable dependencies for security scanning",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@dabh/diagnostics": "^2.0.8",
+    "@rc-component/portal": "^1.1.2",
+    "@rushstack/terminal": "^0.15.2",
+    "@sequelize/mariadb": "^7.0.0-alpha.47",
+    "clone": "^2.1.2",
+    "lodash": "4.17.15",
+    "axios": "0.21.0",
+    "minimist": "1.2.5",
+    "node-fetch": "2.6.0",
+    "@babel/core": "7.12.0",
+    "@types/lodash": "4.14.165",
+    "@types/glob": "7.2.0",
+    "@angular/core": "9.1.0",
+    "@webassemblyjs/wast-printer": "1.9.0",
+    "@sindresorhus/is": "0.14.0",
+    "@sideway/address": "4.1.5",
+    "@parcel/watcher": "2.5.1",
+    "@hapi/hoek": "9.3.0"
+  },
+  "devDependencies": {
+    "marked": "0.7.0",
+    "highlight.js": "9.18.1"
+  },
+  "keywords": ["security", "testing", "cve"],
+  "author": "",
+  "license": "ISC"
 }
